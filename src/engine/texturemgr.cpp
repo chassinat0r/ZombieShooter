@@ -23,6 +23,9 @@ void TextureManager::init() {
 void TextureManager::loadTex(std::string filename, std::string name, int rows, int cols) {
     glBindVertexArray(VAO);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     Texture tex;
     glGenTextures(1, &tex.id);
     glBindTexture(GL_TEXTURE_2D, tex.id);

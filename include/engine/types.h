@@ -1,6 +1,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <string>
+
 typedef struct {
     int width;
     int height;
@@ -15,5 +17,14 @@ typedef struct {
     int y;
     int angle;
 } Camera;
+
+typedef struct {
+    std::string textureName; // name of texture in texture manager
+    int r1; // starting row
+    int c1; // starting column
+    int r2; // ending row
+    int c2; // ending column
+    float duration; // in milliseconds
+} Frame;
 
 #endif

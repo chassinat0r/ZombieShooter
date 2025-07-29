@@ -2,14 +2,22 @@
 #include <GLFW/glfw3.h>
 
 #include <engine/texturemgr.h>
+#include <engine/sprite.h>
 
 #include <stdio.h>
 
 #include <global.h>
+#include <constants.h>
+
+#include <iostream>
+#include <chrono>
+#include <thread>
 
 bool running = false;
 
 GLFWwindow* window;
+
+Sprite *jumpingMan;
 
 void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
     Global::width = w;
@@ -38,8 +46,7 @@ void draw() {
     camera.y = 0;
     camera.angle = 0;
 
-    TextureManager::setTex("test", 0, 1, 1, 3);
-    TextureManager::drawTex(0, 0, 4.0f, camera);
+    jumpingMan->draw(camera, 3.0f);
     glfwSwapBuffers(window);
 }
 
@@ -72,12 +79,42 @@ int main() {
     running = true;
 
     TextureManager::init();
-    TextureManager::loadTex("assets/test.png", "test", 1, 3);
+    TextureManager::loadTex("assets/jumpingman.png", "jumpingman", 2, 2);
+
+    jumpingMan = new Sprite(0, 0);
+    std::vector<Frame> animation;
+    Frame frame;
+    frame.textureName = "jumpingman";
+    frame.duration = 500;
+    frame.c1 = 0;
+    frame.c2 = 1;
+    frame.r1 = 0;
+    frame.r2 = 1;
+    animation.push_back(frame);
+    frame.c1 = 1;
+    frame.c2 = 2;
+    animation.push_back(frame);
+    frame.c1 = 0;
+    frame.c2 = 1;
+    frame.r1 = 1;
+    frame.r2 = 2;
+    animation.push_back(frame);
+
+    jumpingMan->addAnimation("jumping", animation);
+    jumpingMan->setAnimation("jumping");
 
     while (running) {
+        double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
+
+        if (time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME) {
+            std::this_thread::sleep_for(std::chrono::milliseconds((int)time_to_wait));
+        }
+
         handleInput();
         update();
         draw();
+
+        Global::last_frame_time = 1000*glfwGetTime();
     }
 
     glfwTerminate();
