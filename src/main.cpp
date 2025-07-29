@@ -3,6 +3,7 @@
 
 #include <engine/texturemgr.h>
 #include <engine/sprite.h>
+#include <engine/animation.h>
 
 #include <stdio.h>
 
@@ -80,26 +81,18 @@ int main() {
 
     TextureManager::init();
     TextureManager::loadTex("assets/jumpingman.png", "jumpingman", 2, 2);
+    // TextureManager::loadTex("assets/test.png", "test", 2, 3);
 
     jumpingMan = new Sprite(0, 0);
-    std::vector<Frame> animation;
-    Frame frame;
-    frame.textureName = "jumpingman";
-    frame.duration = 500;
-    frame.c1 = 0;
-    frame.c2 = 1;
-    frame.r1 = 0;
-    frame.r2 = 1;
-    animation.push_back(frame);
-    frame.c1 = 1;
-    frame.c2 = 2;
-    animation.push_back(frame);
-    frame.c1 = 0;
-    frame.c2 = 1;
-    frame.r1 = 1;
-    frame.r2 = 2;
-    animation.push_back(frame);
+    Animation animation("jumping");
+    animation.addFrame("jumpingman", 0, 0, 1, 1, 1000);
+    animation.addFrame("jumpingman", 0, 1, 1, 2, 300);
+    animation.addFrame("jumpingman", 1, 0, 2, 1, 300);
+    animation.addFrame("jumpingman", 1, 1, 2, 2, 300);
 
+    // animation.addFrame("test", 0, 0, 1, 1, 500);
+    // animation.addFrame("test", 0, 1, 1, 2, 500);
+    // animation.addFrame("test", 1, 0, 2, 1, 500);
     jumpingMan->addAnimation("jumping", animation);
     jumpingMan->setAnimation("jumping");
 

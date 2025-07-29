@@ -12,26 +12,28 @@ Sprite::Sprite(int x, int y) {
     this->y = y;
 }
 
-void Sprite::addAnimation(std::string name, std::vector<Frame> animation) {
+void Sprite::addAnimation(std::string name, Animation animation) {
     animations[name] = animation;
 }
 
 void Sprite::setAnimation(std::string name) {
     currentAnimation = name;
+    currentFrame = 0;
 }
 
 void Sprite::draw(Camera camera, float scale) {
     timer += 1000*glfwGetTime() - lastUpdate;
     lastUpdate = 1000*glfwGetTime();
-    Frame currentFrameObj = animations[currentAnimation][currentFrame];
+    Animation animation = animations[currentAnimation];
+    Frame currentFrameObj = animation.getFrame(currentFrame);
     if (timer >= currentFrameObj.duration) {
         currentFrame++;
         timer = 0;
     }
-    if (currentFrame == animations[currentAnimation].size()) {
+    if (currentFrame == animation.getNumberOfFrames()) {
         currentFrame = 0;
     }
-    currentFrameObj = animations[currentAnimation][currentFrame];
+    currentFrameObj = animation.getFrame(currentFrame);
 
     TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
     TextureManager::drawTex(x, y, scale, camera);

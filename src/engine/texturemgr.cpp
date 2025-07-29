@@ -36,7 +36,7 @@ void TextureManager::loadTex(std::string filename, std::string name, int rows, i
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(false);
 
     unsigned char *data = stbi_load(filename.c_str(), &tex.width, &tex.height, &tex.nrc, 0);
     if (data)  {
@@ -64,13 +64,13 @@ void TextureManager::setTex(std::string name, int r1, int c1, int r2, int c2) {
     float ROW_FRAC = 1.0f / (float)tex.rows;
 
     texCoords[0] = COL_FRAC * c2;
-    texCoords[1] = ROW_FRAC * r2;
+    texCoords[1] = ROW_FRAC * r1;
     texCoords[2] = COL_FRAC * c2;
-    texCoords[3] = ROW_FRAC * r1;
+    texCoords[3] = ROW_FRAC * r2;
     texCoords[4] = COL_FRAC * c1;
-    texCoords[5] = ROW_FRAC * r1;
+    texCoords[5] = ROW_FRAC * r2;
     texCoords[6] = COL_FRAC * c1;
-    texCoords[7] = ROW_FRAC * r2;
+    texCoords[7] = ROW_FRAC * r1;
 
     float verticesTexCoords[20];
     mergeArrays(vertices, 12, 3, texCoords, 8, 2, verticesTexCoords, 20);
