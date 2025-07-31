@@ -4,6 +4,7 @@
 #include <engine/texturemgr.h>
 #include <engine/sprite.h>
 #include <engine/animation.h>
+#include <engine/keyboard.h>
 
 #include <stdio.h>
 
@@ -32,62 +33,64 @@ void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
 void handleInput() {
     glfwPollEvents();
 
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_W)) {
         if (playerDir != 1) {
-            player->setAnimation("back_still");
             playerDir = 1;
         }
+        player->setAnimation("back_walk");
         playerMoving = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_S)) {
         if (playerDir != 0) {
-            player->setAnimation("front_still");
             playerDir = 0;
         }
+        player->setAnimation("front_walk");
         playerMoving = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_A)) {
         if (playerDir != 2) {
-            player->setAnimation("left_still");
             playerDir = 2;
         }
         playerMoving = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_D)) {
         if (playerDir != 3) {
-            player->setAnimation("right_still");
             playerDir = 3;
         }
         playerMoving = true;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE) {
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_W)) {
         if (playerDir == 1) {
+            player->setAnimation("back_still");
             playerMoving = false;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE) {
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_S)) {
         if (playerDir == 0) {
+            player->setAnimation("front_still");
             playerMoving = false;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE) {
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_A)) {
         if (playerDir == 2) {
+            player->setAnimation("left_still");
             playerMoving = false;
         }
     }
 
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE) {
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_D)) {
         if (playerDir == 3) {
+            player->setAnimation("right_still");
             playerMoving = false;
         }
     }
@@ -155,25 +158,47 @@ int main() {
 
     player = new Sprite(0, 0);
     Animation frontStill("front_still");
-    frontStill.addFrame("player", 0, 0, 1, 1, 500);
-    frontStill.addFrame("player", 0, 1, 1, 2, 500);
+    frontStill.addFrame("player", 0, 0, 1, 1, 700);
+    frontStill.addFrame("player", 0, 1, 1, 2, 700);
 
     Animation backStill("back_still");
-    backStill.addFrame("player", 1, 0, 2, 1, 500);
-    backStill.addFrame("player", 1, 1, 2, 2, 500);
+    backStill.addFrame("player", 1, 0, 2, 1, 700);
+    backStill.addFrame("player", 1, 1, 2, 2, 700);
 
     Animation leftStill("left_still");
-    leftStill.addFrame("player", 3, 0, 4, 1, 500);
-    leftStill.addFrame("player", 3, 1, 4, 2, 500);
+    leftStill.addFrame("player", 3, 0, 4, 1, 700);
+    leftStill.addFrame("player", 3, 1, 4, 2, 700);
 
     Animation rightStill("right_still");
-    rightStill.addFrame("player", 2, 0, 3, 1, 500);
-    rightStill.addFrame("player", 2, 1, 3, 2, 500);
+    rightStill.addFrame("player", 2, 0, 3, 1, 700);
+    rightStill.addFrame("player", 2, 1, 3, 2, 700);
     
     player->addAnimation("front_still", frontStill);
     player->addAnimation("back_still", backStill);
     player->addAnimation("left_still", leftStill);
     player->addAnimation("right_still", rightStill);
+
+    Animation frontWalk("front_walk");
+    frontWalk.addFrame("player", 0, 2, 1, 3, 200);
+    frontWalk.addFrame("player", 0, 3, 1, 4, 200);
+
+    Animation backWalk("back_walk");
+    backWalk.addFrame("player", 1, 2, 2, 3, 200);
+    backWalk.addFrame("player", 1, 3, 2, 4, 200);
+
+    Animation leftWalk("left_walk");
+    leftWalk.addFrame("player", 3, 2, 4, 3, 200);
+    leftWalk.addFrame("player", 3, 3, 4, 4, 200);
+
+    Animation rightWalk("right_walk");
+    rightWalk.addFrame("player", 2, 2, 3, 3, 200);
+    rightWalk.addFrame("player", 2, 3, 3, 4, 200);
+
+    player->addAnimation("front_walk", frontWalk);
+    player->addAnimation("back_walk", backWalk);
+    player->addAnimation("left_walk", leftWalk);
+    player->addAnimation("right_walk", rightWalk);
+
     player->setAnimation("front_still");
 
     while (running) {

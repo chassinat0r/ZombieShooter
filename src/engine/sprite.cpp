@@ -28,12 +28,18 @@ void Sprite::draw(Camera camera, float scale) {
     lastUpdate = 1000*glfwGetTime();
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
+    // printf("Number of frames %d\n", animation.getNumberOfFrames());
     if (timer >= currentFrameObj.duration) {
+        // printf("Timer up!\n");
         currentFrame++;
         timer = 0;
     }
+    // printf("Current frame %d\n", currentFrame);
+    // printf("Current duration %d\n", currentFrameObj.duration);
+
     if (currentFrame == animation.getNumberOfFrames()) {
         currentFrame = 0;
+        // printf("Resetting frame\n");
     }
     currentFrameObj = animation.getFrame(currentFrame);
 
