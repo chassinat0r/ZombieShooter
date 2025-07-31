@@ -11,15 +11,16 @@
 class Sprite {
     public:
         Sprite();
-        Sprite(int x, int y);
+        Sprite(float x, float y);
 
         void addAnimation(std::string name, Animation animation);
         void setAnimation(std::string name);
         void draw(Camera camera, float scale = 1.0f);
+        void move(float dx, float dy);
 
     private:
-        int x;
-        int y;
+        float x;
+        float y;
 
         std::map<std::string,Animation> animations;
         std::string currentAnimation;
