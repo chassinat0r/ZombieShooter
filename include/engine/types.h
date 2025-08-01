@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
     int x;
     int y;
-    int angle;
+    float angle;
 } Camera;
 
 typedef struct {

@@ -7,8 +7,8 @@
 #include <map>
 #include <string>
 
-#define DEF_WIDTH 400
-#define DEF_HEIGHT 300
+#define DEF_WIDTH 200
+#define DEF_HEIGHT 150
 
 class TextureManager {
     public:

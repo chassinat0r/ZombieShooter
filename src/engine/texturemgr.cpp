@@ -106,7 +106,7 @@ void TextureManager::drawTex(int x, int y, float scale, Camera camera) {
     glm::mat4 projection = glm::ortho(left, right, bottom, top, 0.0f, 100.0f);
 
     glm::mat4 view = glm::mat4(1.0f);
-    view  = glm::translate(view, glm::vec3(camera.x, camera.y, 0.0f));    
+    view  = glm::translate(view, glm::vec3(-camera.x, -camera.y, 0.0f));    
     view = glm::scale(view, glm::vec3((float)scale, (float)scale, 1.0f));
     view = glm::scale(view, glm::vec3((float)texWidth, (float)texHeight, 1.0f));
 

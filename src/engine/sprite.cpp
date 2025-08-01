@@ -51,3 +51,7 @@ void Sprite::move(float dx, float dy) {
     x += dx/FPS;
     y += dy/FPS;
 }
+
+float Sprite::getX() { return x; }
+
+float Sprite::getY() { return y; }

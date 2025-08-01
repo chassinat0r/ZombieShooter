@@ -18,6 +18,9 @@ class Sprite {
         void draw(Camera camera, float scale = 1.0f);
         void move(float dx, float dy);
 
+        float getX();
+        float getY();
+
     private:
         float x;
         float y;

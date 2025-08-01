@@ -23,6 +23,9 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Sprite *player;
+Sprite *zombie;
+
+Camera camera = {0, 0, 0};
 
 void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
     Global::width = w;
@@ -101,15 +104,18 @@ void handleInput() {
 void update() {
     if (playerMoving) {
         if (playerDir == 0) {
-            player->move(0, -30);
+            player->move(0, -20);
         } else if (playerDir == 1) {
-            player->move(0, 30);
+            player->move(0, 20);
         } else if (playerDir == 2) {
-            player->move(-30, 0);
+            player->move(-20, 0);
         } else if (playerDir == 3) {
-            player->move(30, 0);
+            player->move(20, 0);
         }
     }
+
+    camera.x = (int)player->getX();
+    camera.y = (int)player->getY();
 
     running = !glfwWindowShouldClose(window);
 }
@@ -118,12 +124,8 @@ void draw() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Camera camera;
-    camera.x = 0;
-    camera.y = 0;
-    camera.angle = 0;
-
-    player->draw(camera, 3.0f);
+    zombie->draw(camera, 0.5f);
+    player->draw(camera, 1.2f);
     glfwSwapBuffers(window);
 }
 
@@ -157,6 +159,7 @@ int main() {
 
     TextureManager::init();
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
+    TextureManager::loadTex("assets/test.png", "test", 2, 3);
 
     player = new Sprite(0, 0);
     Animation frontStill("front_still");
@@ -206,6 +209,18 @@ int main() {
     player->addAnimation("right_walk", rightWalk);
 
     player->setAnimation("front_still");
+
+    zombie = new Sprite(50, 50);
+    Animation zombieStill("zombie_still");
+    zombieStill.addFrame("test", 0, 0, 1, 1, 200);
+    zombieStill.addFrame("test", 0, 1, 1, 2, 200);
+    zombieStill.addFrame("test", 0, 2, 1, 3, 200);
+    zombieStill.addFrame("test", 1, 0, 2, 1, 200);
+    zombieStill.addFrame("test", 1, 1, 2, 2, 200);
+    zombieStill.addFrame("test", 1, 2, 2, 3, 200);
+    zombie->addAnimation("zombie_still", zombieStill);
+    zombie->setAnimation("zombie_still");
+
 
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
