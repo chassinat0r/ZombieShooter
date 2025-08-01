@@ -57,6 +57,7 @@ void handleInput() {
         if (playerDir != 2) {
             playerDir = 2;
         }
+        player->setAnimation("left_walk");
         playerMoving = true;
     }
 
@@ -64,6 +65,7 @@ void handleInput() {
         if (playerDir != 3) {
             playerDir = 3;
         }
+        player->setAnimation("right_walk");
         playerMoving = true;
     }
 
@@ -188,11 +190,15 @@ int main() {
 
     Animation leftWalk("left_walk");
     leftWalk.addFrame("player", 3, 2, 4, 3, 200);
+    leftWalk.addFrame("player", 3, 1, 4, 2, 100);
     leftWalk.addFrame("player", 3, 3, 4, 4, 200);
+    leftWalk.addFrame("player", 3, 1, 4, 2, 100);
 
     Animation rightWalk("right_walk");
     rightWalk.addFrame("player", 2, 2, 3, 3, 200);
+    rightWalk.addFrame("player", 2, 1, 3, 2, 100);
     rightWalk.addFrame("player", 2, 3, 3, 4, 200);
+    rightWalk.addFrame("player", 2, 1, 3, 2, 100);
 
     player->addAnimation("front_walk", frontWalk);
     player->addAnimation("back_walk", backWalk);
