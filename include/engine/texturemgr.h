@@ -41,6 +41,8 @@ class TextureManager {
         static void setTex(std::string name, int r1 = 0, int c1 = 0, int r2 = 1, int c2 = 1);
         static void drawTex(int x, int y, float scale, Camera camera);
 
+        static float getTexWidth(std::string name, int c1, int c2);
+        static float getTexHeight(std::string name, int r1,int r2);
 };
 
 #endif

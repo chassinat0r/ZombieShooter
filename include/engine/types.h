@@ -27,4 +27,11 @@ typedef struct {
     float duration; // in milliseconds
 } Frame;
 
+typedef struct {
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+} Rect;
+
 #endif

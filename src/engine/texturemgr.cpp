@@ -92,6 +92,20 @@ void TextureManager::setTex(std::string name, int r1, int c1, int r2, int c2) {
 
 }
 
+float TextureManager::getTexWidth(std::string name, int c1, int c2) {
+    Texture tex = textures.at(name);
+
+    float texWidth = (float)abs(c2 - c1) * ((float)tex.width / (float)tex.cols);
+    return texWidth;
+}
+
+float TextureManager::getTexHeight(std::string name, int r1,int r2) {
+    Texture tex = textures.at(name);
+
+    float texHeight = (float)abs(r2 - r1) * ((float)tex.height / (float)tex.rows);
+    return texHeight;
+}
+
 void TextureManager::drawTex(int x, int y, float scale, Camera camera) {
     worldShader->use();
 

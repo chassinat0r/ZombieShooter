@@ -124,8 +124,8 @@ void draw() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    zombie->draw(camera, 0.5f);
-    player->draw(camera, 1.2f);
+    // zombie->draw(camera);
+    player->draw(camera);
     glfwSwapBuffers(window);
 }
 
@@ -161,7 +161,7 @@ int main() {
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/test.png", "test", 2, 3);
 
-    player = new Sprite(0, 0);
+    player = new Sprite(0, 0, 1.0f);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -208,9 +208,113 @@ int main() {
     player->addAnimation("left_walk", leftWalk);
     player->addAnimation("right_walk", rightWalk);
 
+    // front still
+    player->addHitbox("front_still", 0, 3, 0, 12, 9);
+    player->addHitbox("front_still", 0, 1, 9, 14, 16);
+    player->addHitbox("front_still", 0, 3, 16, 12, 24);
+
+    player->addHitbox("front_still", 1, 3, 1, 12, 10);
+    player->addHitbox("front_still", 1, 1, 10, 14, 17);
+    player->addHitbox("front_still", 1, 3, 17, 12, 24);
+
+    // back still
+    player->addHitbox("back_still", 0, 3, 0, 12, 9);
+    player->addHitbox("back_still", 0, 1, 9, 14, 16);
+    player->addHitbox("back_still", 0, 3, 16, 12, 24);
+
+    player->addHitbox("back_still", 1, 3, 1, 12, 10);
+    player->addHitbox("back_still", 1, 1, 10, 14, 17);
+    player->addHitbox("back_still", 1, 3, 17, 12, 24);
+
+    // right still
+    player->addHitbox("right_still", 0, 3, 0, 12, 9);
+    player->addHitbox("right_still", 0, 6, 9, 10, 24);
+
+    player->addHitbox("right_still", 1, 3, 1, 12, 10);
+    player->addHitbox("right_still", 1, 6, 10, 10, 24);
+
+    // left still first frame
+    player->addHitbox("left_still", 0, 3, 0, 12, 9);
+    player->addHitbox("left_still", 0, 5, 9, 9, 24);
+    // second frame
+    player->addHitbox("left_still", 1, 3, 1, 12, 10);
+    player->addHitbox("left_still", 1, 5, 10, 9, 24);
+
+    // front walk
+    // frame 1
+    player->addHitbox("front_walk", 0, 3, 1, 12, 10);
+    player->addHitbox("front_walk", 0, 1, 10, 12, 16);
+    player->addHitbox("front_walk", 0, 12, 10, 14, 14);
+    player->addHitbox("front_walk", 0, 3, 16, 7, 22);
+    player->addHitbox("front_walk", 0, 8, 16, 12, 24);
+
+    // frame 2
+    player->addHitbox("front_walk", 1, 3, 1, 12, 10);
+    player->addHitbox("front_walk", 1, 1, 10, 3, 14);
+    player->addHitbox("front_walk", 1, 3, 10, 14, 16);
+    player->addHitbox("front_walk", 1, 3, 16, 7, 24);
+    player->addHitbox("front_walk", 1, 8, 16, 12, 22);
+
+    // back walk
+    // frame 1
+    player->addHitbox("back_walk", 0, 3, 1, 12, 10);
+    player->addHitbox("back_walk", 0, 1, 10, 12, 16);
+    player->addHitbox("back_walk", 0, 12, 10, 14, 14);
+    player->addHitbox("back_walk", 0, 3, 16, 7, 22);
+    player->addHitbox("back_walk", 0, 8, 16, 12, 24);
+
+    // frame 2
+    player->addHitbox("back_walk", 1, 3, 1, 12, 10);
+    player->addHitbox("back_walk", 1, 1, 10, 3, 14);
+    player->addHitbox("back_walk", 1, 3, 10, 14, 16);
+    player->addHitbox("back_walk", 1, 3, 16, 7, 24);
+    player->addHitbox("back_walk", 1, 8, 16, 12, 22);
+
+    // left walk
+    // frame 1
+    player->addHitbox("left_walk", 0, 3, 1, 12, 10);
+    player->addHitbox("left_walk", 0, 4, 10, 10, 17);
+    player->addHitbox("left_walk", 0, 5, 17, 9, 21);
+    player->addHitbox("left_walk", 0, 5, 21, 11, 24);
+
+    // frame 2
+    player->addHitbox("left_walk", 1, 3, 1, 12, 10);
+    player->addHitbox("left_walk", 1, 5, 10, 9, 24);
+
+    // frame 3
+    player->addHitbox("left_walk", 2, 3, 1, 12, 10);
+    player->addHitbox("left_walk", 2, 4, 10, 10, 16);
+    player->addHitbox("left_walk", 2, 5, 16, 9, 22);
+    player->addHitbox("left_walk", 2, 3, 22, 9, 24);
+
+    // frame 4
+    player->addHitbox("left_walk", 3, 3, 1, 12, 10);
+    player->addHitbox("left_walk", 3, 5, 10, 9, 24);
+
+    // right walk
+    // frame 1
+    player->addHitbox("right_walk", 0, 3, 1, 12, 10);
+    player->addHitbox("right_walk", 0, 5, 10, 11, 17);
+    player->addHitbox("right_walk", 0, 6, 17, 9, 21);
+    player->addHitbox("right_walk", 0, 4, 21, 10, 24);
+
+    // frame 2
+    player->addHitbox("right_walk", 1, 3, 1, 12, 10);
+    player->addHitbox("right_walk", 1, 6, 10, 10, 24);
+
+    // frame 3
+    player->addHitbox("right_walk", 2, 3, 1, 12, 10);
+    player->addHitbox("right_walk", 2, 6, 10, 11, 16);
+    player->addHitbox("right_walk", 2, 6, 16, 10, 22);
+    player->addHitbox("right_walk", 2, 6, 22, 12, 24);
+
+    // frame 4
+    player->addHitbox("right_walk", 3, 3, 1, 12, 10);
+    player->addHitbox("right_walk", 3, 6, 10, 10, 24);
+
     player->setAnimation("front_still");
 
-    zombie = new Sprite(50, 50);
+    zombie = new Sprite(50, 50, 0.5f);
     Animation zombieStill("zombie_still");
     zombieStill.addFrame("test", 0, 0, 1, 1, 200);
     zombieStill.addFrame("test", 0, 1, 1, 2, 200);

@@ -11,12 +11,14 @@
 class Sprite {
     public:
         Sprite();
-        Sprite(float x, float y);
+        Sprite(float x, float y, float scale = 1.0f);
 
         void addAnimation(std::string name, Animation animation);
         void setAnimation(std::string name);
-        void draw(Camera camera, float scale = 1.0f);
+        void draw(Camera camera);
         void move(float dx, float dy);
+
+        void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
 
         float getX();
         float getY();
@@ -24,8 +26,10 @@ class Sprite {
     private:
         float x;
         float y;
+        float scale;
 
         std::map<std::string,Animation> animations;
+        std::map<std::string, std::map<int, std::vector<Rect>>> hitboxes;
         std::string currentAnimation;
         int currentFrame = 0;
         double timer = 0;
