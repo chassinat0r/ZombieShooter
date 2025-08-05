@@ -3,6 +3,8 @@
 
 #include <constants.h>
 
+#include <algorithm>
+
 #include <GLFW/glfw3.h>
 
 Sprite::Sprite() {
@@ -24,7 +26,7 @@ void Sprite::setAnimation(std::string name) {
     currentFrame = 0;
 }
 
-void Sprite::draw(Camera camera) {
+void Sprite::update() {
     timer += 1000*glfwGetTime() - lastUpdate;
     lastUpdate = 1000*glfwGetTime();
     Animation animation = animations[currentAnimation];
@@ -40,30 +42,39 @@ void Sprite::draw(Camera camera) {
 
     currentFrameObj = animation.getFrame(currentFrame);
 
-    TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
-    TextureManager::drawTex(x, y, scale, camera);
-
     std::map<int, std::vector<Rect>> framesOfAnimation; 
     float texWidth = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
     float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
-
-    // printf("Texture Width: %.2f\n", texWidth);
-    // printf("Texture Height: %.2f\n", texHeight);
+    
+    currentHitboxes.clear();
+    
     if (hitboxes.count(currentAnimation) != 0) {
         framesOfAnimation = hitboxes.at(currentAnimation);
         if (framesOfAnimation.count(currentFrame) != 0) {
-            std::vector<Rect> hitboxesOfAnimation = framesOfAnimation.at(currentFrame);
-            printf("-----------------\n");
-            for (Rect hb : hitboxesOfAnimation) {
+            std::vector<Rect> frameHitboxes = framesOfAnimation.at(currentFrame);
+            // printf("-----------------\n");
+            for (Rect hb : frameHitboxes) {
                 float realX1 = (x - 0.5f*scale*texWidth) + hb.x1*scale;
                 float realX2 = (x - 0.5f*scale*texWidth) + hb.x2*scale;
                 float realY1 = (y + 0.5f*scale*texHeight) - hb.y1*scale;
                 float realY2 = (y + 0.5f*scale*texHeight) - hb.y2*scale;
-                printf("X: %.2f, Y: %.2f\n", x, y);
-                printf("X1: %.2f, Y1: %.2f, X2: %.2f, Y2: %.2f\n", realX1, realY1, realX2, realY2);
+                currentHitboxes.push_back((Rect_F) { realX1, realY1, realX2, realY2 });
+                // debugging
+                // printf("X: %.2f, Y: %.2f\n", x, y);
+                // printf("X1: %.2f, Y1: %.2f, X2: %.2f, Y2: %.2f\n", realX1, realY1, realX2, realY2);
             }
         }
     } 
+}
+
+void Sprite::draw(Camera camera) {
+    Animation animation = animations[currentAnimation];
+    Frame currentFrameObj = animation.getFrame(currentFrame);
+
+    TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
+    TextureManager::drawTex(x, y, scale, camera);
+
+   
 }
 
 void Sprite::move(float dx, float dy) {
@@ -90,4 +101,21 @@ void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int
     hitboxesForFrame.push_back({ x1, y1, x2, y2 });
     framesForAnimation[frame] = hitboxesForFrame;
     hitboxes[animationName] = framesForAnimation;
+}
+
+bool Sprite::isCollidingWith(Sprite sprite) {
+    std::vector<Rect_F> otherHitboxes = sprite.getHitboxes();
+    for (Rect_F hb1 : currentHitboxes) {
+        for (Rect_F hb2 : otherHitboxes) {
+            if (std::min(hb1.x2, hb2.x2) > std::max(hb1.x1, hb2.x1) && std::min(hb1.y1, hb2.y1) > std::max(hb1.y2, hb2.y2)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+std::vector<Rect_F> Sprite::getHitboxes() {
+    return currentHitboxes;
 }

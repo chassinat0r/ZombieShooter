@@ -17,11 +17,15 @@ class Sprite {
         void setAnimation(std::string name);
         void draw(Camera camera);
         void move(float dx, float dy);
+        void update();
 
         void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
 
         float getX();
         float getY();
+
+        bool isCollidingWith(Sprite sprite);
+        std::vector<Rect_F> getHitboxes();
 
     private:
         float x;
@@ -30,6 +34,8 @@ class Sprite {
 
         std::map<std::string,Animation> animations;
         std::map<std::string, std::map<int, std::vector<Rect>>> hitboxes;
+        std::vector<Rect_F> currentHitboxes;
+        
         std::string currentAnimation;
         int currentFrame = 0;
         double timer = 0;

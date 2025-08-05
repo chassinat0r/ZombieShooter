@@ -19,6 +19,7 @@ bool running = false;
 bool playerMoving = false;
 int playerDir = 0;
 // 0 forward, 1 backward, 2 left, 3 right
+// int count = 0;
 
 GLFWwindow* window;
 
@@ -114,6 +115,14 @@ void update() {
         }
     }
 
+    zombie->update();
+    player->update();
+
+    if (player->isCollidingWith(*zombie)) {
+        printf("Player colliding!\n");
+        // printf("Collision %d!\n", count);
+        // count++;
+    }
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
@@ -124,7 +133,7 @@ void draw() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // zombie->draw(camera);
+    zombie->draw(camera);
     player->draw(camera);
     glfwSwapBuffers(window);
 }
@@ -209,6 +218,10 @@ int main() {
     player->addAnimation("right_walk", rightWalk);
 
     // front still
+    // this was for debugging collision, commented it but not deleting it as it may be needed in the future
+    // player->addHitbox("front_still", 0, 0, 0, 16, 25);
+    // player->addHitbox("front_still", 1, 0, 0, 16, 25);
+
     player->addHitbox("front_still", 0, 3, 0, 12, 9);
     player->addHitbox("front_still", 0, 1, 9, 14, 16);
     player->addHitbox("front_still", 0, 3, 16, 12, 24);
@@ -314,7 +327,7 @@ int main() {
 
     player->setAnimation("front_still");
 
-    zombie = new Sprite(50, 50, 0.5f);
+    zombie = new Sprite(0, 0, 0.5f);
     Animation zombieStill("zombie_still");
     zombieStill.addFrame("test", 0, 0, 1, 1, 200);
     zombieStill.addFrame("test", 0, 1, 1, 2, 200);
@@ -323,6 +336,12 @@ int main() {
     zombieStill.addFrame("test", 1, 1, 2, 2, 200);
     zombieStill.addFrame("test", 1, 2, 2, 3, 200);
     zombie->addAnimation("zombie_still", zombieStill);
+    zombie->addHitbox("zombie_still", 0, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 1, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 2, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 3, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 4, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 5, 0, 0, 40, 40);
     zombie->setAnimation("zombie_still");
 
 

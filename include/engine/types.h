@@ -34,4 +34,11 @@ typedef struct {
     int y2;
 } Rect;
 
+typedef struct {
+    float x1;
+    float y1;
+    float x2;
+    float y2;
+} Rect_F;
+
 #endif
