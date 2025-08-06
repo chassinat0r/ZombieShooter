@@ -24,7 +24,7 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Sprite *player;
-Sprite *zombie;
+Sprite *brick;
 
 Camera camera = {0, 0, 0};
 
@@ -115,12 +115,9 @@ void update() {
         }
     }
 
-    zombie->update();
+    brick->update();
     player->update();
 
-    if (player->isCollidingWith(*zombie)) {
-        printf("Player colliding!\n");
-    }
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
@@ -131,7 +128,7 @@ void draw() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    zombie->draw(camera);
+    brick->draw(camera);
     player->draw(camera);
     glfwSwapBuffers(window);
 }
@@ -166,7 +163,7 @@ int main() {
 
     TextureManager::init();
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
-    TextureManager::loadTex("assets/test.png", "test", 2, 3);
+    TextureManager::loadTex("assets/stone.png", "stone", 1, 1);
 
     player = new Sprite(0, 30, 1.0f, true);
     Animation frontStill("front_still");
@@ -325,23 +322,12 @@ int main() {
 
     player->setAnimation("front_still");
 
-    zombie = new Sprite(0, 0, 0.5f, true);
-    Animation zombieStill("zombie_still");
-    zombieStill.addFrame("test", 0, 0, 1, 1, 200);
-    zombieStill.addFrame("test", 0, 1, 1, 2, 200);
-    zombieStill.addFrame("test", 0, 2, 1, 3, 200);
-    zombieStill.addFrame("test", 1, 0, 2, 1, 200);
-    zombieStill.addFrame("test", 1, 1, 2, 2, 200);
-    zombieStill.addFrame("test", 1, 2, 2, 3, 200);
-    zombie->addAnimation("zombie_still", zombieStill);
-    zombie->addHitbox("zombie_still", 0, 0, 0, 40, 20);
-    zombie->addHitbox("zombie_still", 1, 0, 0, 40, 20);
-    zombie->addHitbox("zombie_still", 2, 0, 0, 40, 20);
-    zombie->addHitbox("zombie_still", 3, 0, 0, 40, 20);
-    zombie->addHitbox("zombie_still", 4, 0, 0, 40, 20);
-    zombie->addHitbox("zombie_still", 5, 0, 0, 40, 20);
-    zombie->setAnimation("zombie_still");
-
+    brick = new Sprite(0, 0, 1.0f, true);
+    Animation stone("stone");
+    stone.addFrame("stone", 0, 0, 1, 1, 200);
+    brick->addAnimation("stone", stone);
+    brick->addHitbox("stone", 0, 0, 0, 16, 8);
+    brick->setAnimation("stone");
 
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
