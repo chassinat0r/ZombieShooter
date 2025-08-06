@@ -118,11 +118,11 @@ void update() {
     zombie->update();
     player->update();
 
-    if (player->isCollidingWith(*zombie)) {
-        printf("Player colliding!\n");
-        // printf("Collision %d!\n", count);
-        // count++;
-    }
+    // if (player->isCollidingWith(*zombie)) {
+    //     printf("Player colliding!\n");
+    //     // printf("Collision %d!\n", count);
+    //     // count++;
+    // }
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 

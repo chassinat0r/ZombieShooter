@@ -11,10 +11,14 @@ Sprite::Sprite() {
 
 }
 
-Sprite::Sprite(float x, float y, float scale) {
+Sprite::Sprite(float x, float y, float scale, bool solid) {
     this->x = x;
     this->y = y;
     this->scale = scale;
+    this->solid = solid;
+    this->id = count;
+    count++;
+    sprites.push_back(this);
 }
 
 void Sprite::addAnimation(std::string name, Animation animation) {
