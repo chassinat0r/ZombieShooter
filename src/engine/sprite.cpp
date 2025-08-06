@@ -33,6 +33,13 @@ void Sprite::setAnimation(std::string name) {
 void Sprite::update() {
     timer += 1000*glfwGetTime() - lastUpdate;
     lastUpdate = 1000*glfwGetTime();
+
+    lastX = x;
+    lastY = y;
+
+    x += velocityX/FPS;
+    y += velocityY/FPS;
+
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
     if (timer >= currentFrameObj.duration) {
@@ -68,7 +75,34 @@ void Sprite::update() {
                 // printf("X1: %.2f, Y1: %.2f, X2: %.2f, Y2: %.2f\n", realX1, realY1, realX2, realY2);
             }
         }
-    } 
+    }
+
+    bool collision = false;
+
+    if (solid) {
+        for (Sprite *s : sprites) {
+            if (s->solid && s->getID() != id) {
+                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
+                for (Rect_F hb1 : currentHitboxes) {
+                    for (Rect_F hb2 : otherHitboxes) {
+                        if (std::min(hb1.x2, hb2.x2) > std::max(hb1.x1, hb2.x1) && std::min(hb1.y1, hb2.y1) > std::max(hb1.y2, hb2.y2)) {
+                            collision = true;
+                            break;
+                        }
+                    }
+                    if (collision) { break; }
+                }
+            }
+        }
+
+        if (collision) {
+            x = lastX;
+            y = lastY;
+        }
+    }
+
+    velocityX = 0.0f;
+    velocityY = 0.0f;
 }
 
 void Sprite::draw(Camera camera) {
@@ -82,8 +116,8 @@ void Sprite::draw(Camera camera) {
 }
 
 void Sprite::move(float dx, float dy) {
-    x += dx/FPS;
-    y += dy/FPS;
+    velocityX += dx;
+    velocityY += dy;
 }
 
 float Sprite::getX() { return x; }
@@ -122,4 +156,8 @@ bool Sprite::isCollidingWith(Sprite sprite) {
 
 std::vector<Rect_F> Sprite::getHitboxes() {
     return currentHitboxes;
+}
+
+int Sprite::getID() {
+    return id;
 }

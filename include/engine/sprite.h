@@ -24,14 +24,17 @@ class Sprite {
         float getX();
         float getY();
 
+        int getID();
+
         bool isCollidingWith(Sprite sprite);
         std::vector<Rect_F> getHitboxes();
+
+        bool solid;
 
     private:
         float x;
         float y;
         float scale;
-        bool solid;
 
         std::map<std::string,Animation> animations;
         std::map<std::string, std::map<int, std::vector<Rect>>> hitboxes;
@@ -45,6 +48,11 @@ class Sprite {
         inline static std::vector<Sprite*> sprites;
         inline static int count = 0;
         int id;
+
+        float lastX;
+        float lastY;
+        float velocityX = 0.0f;
+        float velocityY = 0.0f;
 };
 
 #endif

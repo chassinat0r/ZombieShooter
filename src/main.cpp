@@ -118,11 +118,9 @@ void update() {
     zombie->update();
     player->update();
 
-    // if (player->isCollidingWith(*zombie)) {
-    //     printf("Player colliding!\n");
-    //     // printf("Collision %d!\n", count);
-    //     // count++;
-    // }
+    if (player->isCollidingWith(*zombie)) {
+        printf("Player colliding!\n");
+    }
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
@@ -170,7 +168,7 @@ int main() {
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/test.png", "test", 2, 3);
 
-    player = new Sprite(0, 0, 1.0f);
+    player = new Sprite(0, 30, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -327,7 +325,7 @@ int main() {
 
     player->setAnimation("front_still");
 
-    zombie = new Sprite(0, 0, 0.5f);
+    zombie = new Sprite(0, 0, 0.5f, true);
     Animation zombieStill("zombie_still");
     zombieStill.addFrame("test", 0, 0, 1, 1, 200);
     zombieStill.addFrame("test", 0, 1, 1, 2, 200);
@@ -336,12 +334,12 @@ int main() {
     zombieStill.addFrame("test", 1, 1, 2, 2, 200);
     zombieStill.addFrame("test", 1, 2, 2, 3, 200);
     zombie->addAnimation("zombie_still", zombieStill);
-    zombie->addHitbox("zombie_still", 0, 0, 0, 40, 40);
-    zombie->addHitbox("zombie_still", 1, 0, 0, 40, 40);
-    zombie->addHitbox("zombie_still", 2, 0, 0, 40, 40);
-    zombie->addHitbox("zombie_still", 3, 0, 0, 40, 40);
-    zombie->addHitbox("zombie_still", 4, 0, 0, 40, 40);
-    zombie->addHitbox("zombie_still", 5, 0, 0, 40, 40);
+    zombie->addHitbox("zombie_still", 0, 0, 0, 40, 20);
+    zombie->addHitbox("zombie_still", 1, 0, 0, 40, 20);
+    zombie->addHitbox("zombie_still", 2, 0, 0, 40, 20);
+    zombie->addHitbox("zombie_still", 3, 0, 0, 40, 20);
+    zombie->addHitbox("zombie_still", 4, 0, 0, 40, 20);
+    zombie->addHitbox("zombie_still", 5, 0, 0, 40, 20);
     zombie->setAnimation("zombie_still");
 
 
