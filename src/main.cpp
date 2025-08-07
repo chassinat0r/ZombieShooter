@@ -5,6 +5,7 @@
 #include <engine/sprite.h>
 #include <engine/animation.h>
 #include <engine/keyboard.h>
+#include <engine/level.h>
 
 #include <stdio.h>
 
@@ -24,7 +25,9 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Sprite *player;
-Sprite *brick;
+// Sprite *brick;
+
+Level *level;
 
 Camera camera = {0, 0, 0};
 
@@ -115,7 +118,7 @@ void update() {
         }
     }
 
-    brick->update();
+    // brick->update();
     player->update();
 
     camera.x = (int)player->getX();
@@ -128,7 +131,8 @@ void draw() {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    brick->draw(camera);
+    // brick->draw(camera);
+    level->render(camera);
     player->draw(camera);
     glfwSwapBuffers(window);
 }
@@ -165,7 +169,7 @@ int main() {
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/stone.png", "stone", 1, 1);
 
-    player = new Sprite(0, 30, 1.0f, true);
+    player = new Sprite(0, 0, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -322,13 +326,21 @@ int main() {
 
     player->setAnimation("front_still");
 
-    brick = new Sprite(0, 0, 1.0f, true);
-    Animation stone("stone");
-    stone.addFrame("stone", 0, 0, 1, 1, 200);
-    brick->addAnimation("stone", stone);
-    brick->addHitbox("stone", 0, 0, 0, 16, 8);
-    brick->setAnimation("stone");
+    // brick = new Sprite(0, 0, 1.0f, true);
+    // Animation stone("stone");
+    // stone.addFrame("stone", 0, 0, 1, 1, 200);
+    // brick->addAnimation("stone", stone);
+    // brick->addHitbox("stone", 0, 0, 0, 16, 8);
+    // brick->setAnimation("stone");
 
+    level = new Level();
+    int layer = level->newLayer(16, 16);
+
+    int stone = level->addTile("stone", 0, 0, 1, 1, true);
+    level->addHitbox(stone, 0, 0, 16, 12);
+    level->fillLayer(layer, stone, 0, 0, 1, 1);
+    // level->fillLayer(layer, stone, -1, -3, 2, 2);
+    
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
 

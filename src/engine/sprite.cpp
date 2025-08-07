@@ -111,8 +111,6 @@ void Sprite::draw(Camera camera) {
 
     TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
     TextureManager::drawTex(x, y, scale, camera);
-
-   
 }
 
 void Sprite::move(float dx, float dy) {

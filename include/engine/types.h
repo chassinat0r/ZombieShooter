@@ -41,4 +41,18 @@ typedef struct {
     float y2;
 } Rect_F;
 
+typedef struct {
+    int x;
+    int y;
+} Pos_I;
+
+typedef struct {
+    std::string textureName;
+    int r1;
+    int c1;
+    int r2; 
+    int c2;
+    bool solid;
+} Tile;
+
 #endif
