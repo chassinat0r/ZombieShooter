@@ -27,8 +27,6 @@ GLFWwindow* window;
 Sprite *player;
 // Sprite *brick;
 
-Level *level;
-
 Camera camera = {0, 0, 0};
 
 void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
@@ -132,7 +130,7 @@ void draw() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // brick->draw(camera);
-    level->render(camera);
+    Global::level->render(camera);
     player->draw(camera);
     glfwSwapBuffers(window);
 }
@@ -169,7 +167,7 @@ int main() {
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/stone.png", "stone", 1, 1);
 
-    player = new Sprite(0, 0, 1.0f, true);
+    player = new Sprite(0, 40, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -333,12 +331,12 @@ int main() {
     // brick->addHitbox("stone", 0, 0, 0, 16, 8);
     // brick->setAnimation("stone");
 
-    level = new Level();
-    int layer = level->newLayer(16, 16);
+    Global::level = new Level();
+    int layer = Global::level->newLayer(16, 16);
 
-    int stone = level->addTile("stone", 0, 0, 1, 1, true);
-    level->addHitbox(stone, 0, 0, 16, 12);
-    level->fillLayer(layer, stone, 0, 0, 1, 1);
+    int stone = Global::level->addTile("stone", 0, 0, 1, 1, true);
+    Global::level->addHitbox(stone, 0, 0, 16, 8);
+    Global::level->fillLayer(layer, stone, 0, 0, 4, 1);
     // level->fillLayer(layer, stone, -1, -3, 2, 2);
     
     while (running) {

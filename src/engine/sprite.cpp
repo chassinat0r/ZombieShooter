@@ -2,6 +2,7 @@
 #include <engine/texturemgr.h>
 
 #include <constants.h>
+#include <global.h>
 
 #include <algorithm>
 
@@ -91,6 +92,42 @@ void Sprite::update() {
                         }
                     }
                     if (collision) { break; }
+                }
+            }
+        }
+
+        for (int l = 0; l < Global::level->getLayerCount(); l++) {
+            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
+
+            std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
+            int tileWidth = tileDimensions.first;
+            int tileHeight = tileDimensions.second;
+
+            for (int r = 0; r < layer.size(); r++) {
+                std::map<int,int> row = layer[r];
+                for (auto it : row) {
+                    int c = it.first;
+                    int t = it.second;
+                    Tile tile = Global::level->getTile(t);
+                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
+                    if (tile.solid) {
+                        int texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
+                        int texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
+
+                        for (Rect_F hb1 : currentHitboxes) {
+                            for (Rect hb2 : tileHitboxes) {
+                                float realX1 = (c*tileWidth - 0.5f*texWidth) + hb2.x1;
+                                float realX2 = (c*tileWidth - 0.5f*texWidth) + hb2.x2;
+                                float realY1 = (r*tileHeight + 0.5f*texHeight) - hb2.y1;
+                                float realY2 = (r*tileHeight + 0.5f*texHeight) - hb2.y2;
+                                if (std::min(hb1.x2, realX2) > std::max(hb1.x1, realX1) && std::min(hb1.y1, realY1) > std::max(hb1.y2, realY2)) {
+                                    collision = true;
+                                    break;
+                                }
+                            }
+                            if (collision) { break; }
+                        }
+                    }
                 }
             }
         }

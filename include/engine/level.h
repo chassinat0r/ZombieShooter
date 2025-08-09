@@ -18,6 +18,13 @@ class Level {
         int newLayer(int tileWidth, int tileHeight);
         void fillLayer(int layer, int tile, int x1, int y1, int x2, int y2);
 
+        int getLayerCount();
+        std::map<int, std::map<int,int>> getLayer(int l);
+
+        Tile getTile(int t);
+        std::vector<Rect> getHitboxes(int t);
+        std::pair<int,int> getTileSize(int l);
+        
         void render(Camera camera);
 
     private:

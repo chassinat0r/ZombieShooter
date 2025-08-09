@@ -75,3 +75,23 @@ void Level::render(Camera camera) {
     }
     layerNo++;
 }
+
+int Level::getLayerCount() {
+    return layers.size();
+}
+
+std::map<int, std::map<int,int>> Level::getLayer(int l) {
+    return layers[l];
+}
+
+Tile Level::getTile(int t) {
+    return tiles[t];
+}
+
+std::vector<Rect> Level::getHitboxes(int t) {
+    return hitboxes[t];
+}
+
+std::pair<int, int> Level::getTileSize(int l) {
+    return layerTileSizes[l];
+}
