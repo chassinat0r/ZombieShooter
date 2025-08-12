@@ -333,10 +333,14 @@ int main() {
 
     Global::level = new Level();
     int layer = Global::level->newLayer(16, 16);
+    player->addCollisionLayer(layer);
 
     int stone = Global::level->addTile("stone", 0, 0, 1, 1, true);
     Global::level->addHitbox(stone, 0, 0, 16, 8);
     Global::level->fillLayer(layer, stone, 0, 0, 4, 1);
+    
+    int layer2 = Global::level->newLayer(16, 16);
+    Global::level->fillLayer(layer2, stone, 4, 4, 8, 8);
     // level->fillLayer(layer, stone, -1, -3, 2, 2);
     
     while (running) {

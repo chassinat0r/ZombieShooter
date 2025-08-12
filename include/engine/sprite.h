@@ -20,7 +20,9 @@ class Sprite {
         void update();
 
         void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
-
+        void addCollisionLayer(int layer);
+        bool doesCollideOnLayer(int layer);
+        
         float getX();
         float getY();
 
@@ -53,6 +55,8 @@ class Sprite {
         float lastY;
         float velocityX = 0.0f;
         float velocityY = 0.0f;
+
+        std::vector<int> collisionLayers;
 };
 
 #endif

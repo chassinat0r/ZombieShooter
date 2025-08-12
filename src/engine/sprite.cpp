@@ -120,7 +120,7 @@ void Sprite::update() {
                                 float realX2 = (c*tileWidth - 0.5f*texWidth) + hb2.x2;
                                 float realY1 = (r*tileHeight + 0.5f*texHeight) - hb2.y1;
                                 float realY2 = (r*tileHeight + 0.5f*texHeight) - hb2.y2;
-                                if (std::min(hb1.x2, realX2) > std::max(hb1.x1, realX1) && std::min(hb1.y1, realY1) > std::max(hb1.y2, realY2)) {
+                                if (std::min(hb1.x2, realX2) > std::max(hb1.x1, realX1) && std::min(hb1.y1, realY1) > std::max(hb1.y2, realY2) && std::find(collisionLayers.begin(), collisionLayers.end(), l) != collisionLayers.end()) {
                                     collision = true;
                                     break;
                                 }
@@ -195,4 +195,14 @@ std::vector<Rect_F> Sprite::getHitboxes() {
 
 int Sprite::getID() {
     return id;
+}
+
+void Sprite::addCollisionLayer(int layer) {
+    if (std::find(collisionLayers.begin(), collisionLayers.end(), layer) == collisionLayers.end()) {
+        collisionLayers.push_back(layer);
+    }
+}
+
+bool Sprite::doesCollideOnLayer(int layer) {
+    return std::find(collisionLayers.begin(), collisionLayers.end(), layer) != collisionLayers.end();
 }
