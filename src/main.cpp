@@ -14,7 +14,7 @@
 
 #include <iostream>
 #include <chrono>
-#include <thread>
+#include <thread> 
 
 bool running = false;
 bool playerMoving = false;
@@ -25,7 +25,7 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Sprite *player;
-// Sprite *brick;
+Sprite *zombie;
 
 Camera camera = {0, 0, 0};
 
@@ -118,6 +118,7 @@ void update() {
 
     // brick->update();
     player->update();
+    zombie->update();
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -132,6 +133,8 @@ void draw() {
     // brick->draw(camera);
     Global::level->render(camera);
     player->draw(camera);
+    zombie->draw(camera);
+
     glfwSwapBuffers(window);
 }
 
@@ -166,6 +169,9 @@ int main() {
     TextureManager::init();
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/stone.png", "stone", 1, 1);
+    TextureManager::loadTex("assets/floor.png", "floor", 1, 1);
+
+    TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
     player = new Sprite(0, 40, 1.0f, true);
     Animation frontStill("front_still");
@@ -331,18 +337,35 @@ int main() {
     // brick->addHitbox("stone", 0, 0, 0, 16, 8);
     // brick->setAnimation("stone");
 
-    Global::level = new Level();
-    int layer = Global::level->newLayer(16, 16);
-    player->addCollisionLayer(layer);
+    zombie = new Sprite(30, 30, 1.0f, true);
+    
+    Animation zombieFrontStill("zombie_front_still");
+    zombieFrontStill.addFrame("zombie", 0, 0, 1, 1, 700);
+    zombieFrontStill.addFrame("zombie", 0, 1, 1, 2, 700);
+    
+    zombie->addAnimation("zombie_front_still", zombieFrontStill);
 
+    zombie->addHitbox("zombie_front_still", 0, 1, 0, 14, 24);
+    zombie->addHitbox("zombie_front_still", 1, 1, 1, 14, 24);
+
+    zombie->setAnimation("zombie_front_still");
+
+    Global::level = new Level();
+
+    int floor = Global::level->newLayer(16, 16);
+    int layer = Global::level->newLayer(16, 12);
+    player->addCollisionLayer(layer);
+    zombie->addCollisionLayer(layer);
+
+    int carpet = Global::level->addTile("floor", 0, 0, 1, 1, false);
     int stone = Global::level->addTile("stone", 0, 0, 1, 1, true);
     Global::level->addHitbox(stone, 0, 0, 16, 8);
-    Global::level->fillLayer(layer, stone, 0, 0, 4, 1);
-    
-    int layer2 = Global::level->newLayer(16, 16);
-    Global::level->fillLayer(layer2, stone, 4, 4, 8, 8);
-    // level->fillLayer(layer, stone, -1, -3, 2, 2);
-    
+    Global::level->fillLayer(layer, stone, -4, 4, 4, 5);
+    Global::level->fillLayer(layer, stone, -4, 4, -3, -4);
+    Global::level->fillLayer(layer, stone, 4, 4, 3, -4);
+    Global::level->fillLayer(layer, stone, -4, -4, 4, -3);
+    Global::level->fillLayer(floor, carpet, -4, -3, 4, 4);
+
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
 

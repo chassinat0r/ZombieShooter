@@ -1,6 +1,7 @@
 #include <engine/level.h>
 
 #include <algorithm>
+#include <stack>
 
 Level::Level() {
 
@@ -48,6 +49,7 @@ void Level::fillLayer(int layer, int tile, int x1, int y1, int x2, int y2) {
     }
 
     layers[layer] = layerMap;
+
 }
 
 void Level::render(Camera camera) {
@@ -57,8 +59,14 @@ void Level::render(Camera camera) {
     for (std::map<int,std::map<int,int>> layer : layers) {
         int layerTileWidth = layerTileSizes[layerNo].first;
         int layerTileHeight = layerTileSizes[layerNo].second;
+        std::stack<int> rows;
+
         for (auto it : layer) {
-            int r = it.first;
+            rows.push(it.first);
+        }
+
+        while (!rows.empty()) {
+            int r = rows.top();
             std::map<int,int> row = layer[r];
             for (auto it2 : row) {
                 int c = it2.first;
@@ -71,9 +79,12 @@ void Level::render(Camera camera) {
                 TextureManager::setTex(tile.textureName, tile.r1, tile.c1, tile.r2, tile.c2);
                 TextureManager::drawTex(x, y, 1.0f, camera);
             }
+
+            rows.pop();
         }
+
+        layerNo++;
     }
-    layerNo++;
 }
 
 int Level::getLayerCount() {

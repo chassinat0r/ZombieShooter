@@ -59,7 +59,7 @@ void Sprite::update() {
     float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
     
     currentHitboxes.clear();
-    
+
     if (hitboxes.count(currentAnimation) != 0) {
         framesOfAnimation = hitboxes.at(currentAnimation);
         if (framesOfAnimation.count(currentFrame) != 0) {
@@ -103,7 +103,8 @@ void Sprite::update() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            for (int r = 0; r < layer.size(); r++) {
+            for (auto rit : layer) {
+                int r = rit.first;
                 std::map<int,int> row = layer[r];
                 for (auto it : row) {
                     int c = it.first;
