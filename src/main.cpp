@@ -16,6 +16,8 @@
 #include <chrono>
 #include <thread> 
 
+#include <zombie.h>
+
 bool running = false;
 bool playerMoving = false;
 int playerDir = 0;
@@ -25,7 +27,9 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Sprite *player;
-Sprite *zombie;
+Zombie *zombie;
+
+bool route = false;
 
 Camera camera = {0, 0, 0};
 
@@ -117,8 +121,13 @@ void update() {
     }
 
     // brick->update();
-    player->update();
     zombie->update();
+    player->update();
+
+    if (!route) {
+        zombie->getPathToTarget();
+        route = true;
+    }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -132,8 +141,8 @@ void draw() {
 
     // brick->draw(camera);
     Global::level->render(camera);
-    player->draw(camera);
     zombie->draw(camera);
+    player->draw(camera);
 
     glfwSwapBuffers(window);
 }
@@ -173,7 +182,7 @@ int main() {
 
     TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
-    player = new Sprite(0, 40, 1.0f, true);
+    player = new Sprite(-45, -20, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -337,7 +346,8 @@ int main() {
     // brick->addHitbox("stone", 0, 0, 0, 16, 8);
     // brick->setAnimation("stone");
 
-    zombie = new Sprite(30, 30, 1.0f, true);
+    zombie = new Zombie(30, 30, 1.0f, true);
+    zombie->setTarget(player->getID());
     
     Animation zombieFrontStill("zombie_front_still");
     zombieFrontStill.addFrame("zombie", 0, 0, 1, 1, 700);
@@ -363,7 +373,10 @@ int main() {
     Global::level->fillLayer(layer, stone, -4, 4, 4, 5);
     Global::level->fillLayer(layer, stone, -4, 4, -3, -4);
     Global::level->fillLayer(layer, stone, 4, 4, 3, -4);
+    // Global::level->fillLayer(layer, stone, -1, -3, 0, -1);
+    // Global::level->fillLayer(layer, stone, -1, 4, 0, 2);
     Global::level->fillLayer(layer, stone, -4, -4, 4, -3);
+
     Global::level->fillLayer(floor, carpet, -4, -3, 4, 4);
 
     while (running) {

@@ -47,6 +47,11 @@ typedef struct {
 } Pos_I;
 
 typedef struct {
+    float x;
+    float y;
+} Pos_F;
+
+typedef struct {
     std::string textureName;
     int r1;
     int c1;

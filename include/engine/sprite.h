@@ -17,7 +17,7 @@ class Sprite {
         void setAnimation(std::string name);
         void draw(Camera camera);
         void move(float dx, float dy);
-        void update();
+        virtual void update();
 
         void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
         void addCollisionLayer(int layer);
@@ -33,7 +33,7 @@ class Sprite {
 
         bool solid;
 
-    private:
+    protected:
         float x;
         float y;
         float scale;
