@@ -124,10 +124,10 @@ void update() {
     zombie->update();
     player->update();
 
-    if (!route) {
-        zombie->getPathToTarget();
-        route = true;
-    }
+    // if (!route) {
+    //     zombie->getPathToTarget();
+    //     route = true;
+    // }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -179,6 +179,7 @@ int main() {
     TextureManager::loadTex("assets/player.png", "player", 4, 4);
     TextureManager::loadTex("assets/stone.png", "stone", 1, 1);
     TextureManager::loadTex("assets/floor.png", "floor", 1, 1);
+    TextureManager::loadTex("assets/debug.png", "debug", 1, 1);
 
     TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
@@ -369,12 +370,14 @@ int main() {
 
     int carpet = Global::level->addTile("floor", 0, 0, 1, 1, false);
     int stone = Global::level->addTile("stone", 0, 0, 1, 1, true);
+    Global::debug = Global::level->addTile("debug", 0, 0, 1, 1, true);
+
     Global::level->addHitbox(stone, 0, 0, 16, 8);
     Global::level->fillLayer(layer, stone, -4, 4, 4, 5);
     Global::level->fillLayer(layer, stone, -4, 4, -3, -4);
     Global::level->fillLayer(layer, stone, 4, 4, 3, -4);
     // Global::level->fillLayer(layer, stone, -1, -3, 0, -1);
-    // Global::level->fillLayer(layer, stone, -1, 4, 0, 2);
+    Global::level->fillLayer(layer, stone, -1, 4, 0, 2);
     Global::level->fillLayer(layer, stone, -4, -4, 4, -3);
 
     Global::level->fillLayer(floor, carpet, -4, -3, 4, 4);

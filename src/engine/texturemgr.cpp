@@ -54,7 +54,7 @@ void TextureManager::loadTex(std::string filename, std::string name, int rows, i
     textures.insert({name, tex});
 }
 
-void TextureManager::setTex(std::string name, int r1, int c1, int r2, int c2) {
+void TextureManager::setTex(std::string name, int r1, int c1, int r2, int c2, std::string anchorX, std::string anchorY) {
     Texture tex = textures.at(name);
     glBindTexture(GL_TEXTURE_2D, tex.id);
 
@@ -62,6 +62,40 @@ void TextureManager::setTex(std::string name, int r1, int c1, int r2, int c2) {
 
     float COL_FRAC = 1.0f / (float)tex.cols;
     float ROW_FRAC = 1.0f / (float)tex.rows;
+
+    if (anchorX == "left" || anchorX == "LEFT") {
+        vertices[0] = 1.0f;
+        vertices[3] = 1.0f;
+        vertices[6] = 0.0f;
+        vertices[9] = 0.0f;
+    } else if (anchorX == "right" || anchorX == "RIGHT") {
+        vertices[0] = 0.0f;
+        vertices[3] = 0.0f;
+        vertices[6] = -1.0f;
+        vertices[9] = -1.0f;
+    } else {
+        vertices[0] = 0.5f;
+        vertices[3] = 0.5f;
+        vertices[6] = -0.5f;
+        vertices[9] = -0.5f;
+    }
+
+    if (anchorY == "bottom" || anchorY == "BOTTOM") {
+        vertices[1] = 1.0f;
+        vertices[4] = 0.0f;
+        vertices[7] = 0.0f;
+        vertices[10] = 1.0f;
+    } else if (anchorY == "top" || anchorY == "TOP") {
+        vertices[1] = 0.0f;
+        vertices[4] = -1.0f;
+        vertices[7] = -1.0f;
+        vertices[10] = 0.0f;
+    } else {
+        vertices[1] = 0.5f;
+        vertices[4] = -0.5f;
+        vertices[7] = -0.5f;
+        vertices[10] = 0.5f;
+    }
 
     texCoords[0] = COL_FRAC * c2;
     texCoords[1] = ROW_FRAC * r1;
@@ -106,7 +140,7 @@ float TextureManager::getTexHeight(std::string name, int r1,int r2) {
     return texHeight;
 }
 
-void TextureManager::drawTex(int x, int y, float scale, Camera camera) {
+void TextureManager::drawTex(float x, float y, float scale, Camera camera) {
     worldShader->use();
 
     float h = DEF_HEIGHT;

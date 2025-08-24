@@ -23,3 +23,64 @@ void mergeArrays(const float *vertices, int vertices_length,  int vert_stride, c
 		}
 	}
 }
+
+bool doObjectsCollide(std::vector<Rect_F> obj1, std::vector<Rect_F> obj2) {
+	for (Rect_F hb1 : obj1) {
+		float h1x1 = std::min(hb1.x1, hb1.x2);
+		float h1x2 = std::max(hb1.x1, hb1.x2);
+		float h1y1 = std::min(hb1.y1, hb1.y2);
+		float h1y2 = std::max(hb1.y1, hb1.y2);
+
+		for (Rect_F hb2 : obj2) {
+			float h2x1 = std::min(hb2.x1, hb2.x2);
+			float h2x2 = std::max(hb2.x1, hb2.x2);
+			float h2y1 = std::min(hb2.y1, hb2.y2);
+			float h2y2 = std::max(hb2.y1, hb2.y2);
+
+			if (std::min(h1x2, h2x2) > std::max(h1x1, h2x1) && std::min(h1y2, h2y2) > std::max(h1y1, h2y1)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+std::vector<Rect_F> getRealHitboxes(std::vector<Rect> objHitboxes, float x, float y, int width, int height, float scale, std::string anchorX, std::string anchorY) {
+	std::vector<Rect_F> hitboxes;
+
+	for (Rect hb : objHitboxes) {
+		float x1 = std::min(hb.x1, hb.x2);
+		float x2 = std::max(hb.x1, hb.x2);
+		float y1 = std::min(hb.y1, hb.y2);
+		float y2 = std::max(hb.y1, hb.y2);
+
+		Rect_F hitbox;
+
+		if (anchorX == "left" || anchorX == "LEFT") {
+			hitbox.x1 = x + x1*scale;
+			hitbox.x2 = x + x2*scale;
+		} else if (anchorX == "right" || anchorX == "RIGHT") {
+			hitbox.x1 = x - width*scale + x1*scale;
+			hitbox.x2 = x - width*scale + x2*scale;
+		} else {
+			hitbox.x1 = x - 0.5f*width*scale + x1*scale;
+			hitbox.x2 = x - 0.5f*width*scale + x2*scale;
+		}
+
+		if (anchorY == "bottom" || anchorY == "BOTTOM") {
+			hitbox.y1 = y + y1*scale;
+			hitbox.y2 = y + y2*scale;
+		} else if (anchorY == "top" || anchorY == "TOP") {
+			hitbox.y1 = y - height*scale + y1*scale;
+			hitbox.y2 = y - height*scale + y2*scale;
+		} else {
+			hitbox.y1 = y + 0.5f*height*scale - y2*scale;
+			hitbox.y2 = y + 0.5f*height*scale - y1*scale;
+		}
+
+		hitboxes.push_back(hitbox);
+	}
+
+	return hitboxes;
+}

@@ -15,6 +15,7 @@ class Level {
         int addTile(std::string textureName, int r1 = 0, int c1 = 0, int r2 = 1, int c2 = 1, bool solid = false);
         void addHitbox(int tile, int x1, int y1, int x2, int y2);
 
+        void setTile(int l, int tile, int x, int y);
         int newLayer(int tileWidth, int tileHeight);
         void fillLayer(int layer, int tile, int x1, int y1, int x2, int y2);
 

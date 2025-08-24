@@ -24,6 +24,22 @@ void Level::addHitbox(int tile, int x1, int y1, int x2, int y2) {
     hitboxes[tile] = hitboxesForTile;
 }
 
+void Level::setTile(int l, int tile, int x, int y) {
+    if (layers.size() > l) {
+        std::map<int,std::map<int, int>> layer = layers[l];
+        
+        std::map<int, int> row;
+
+        if (layer.count(y) > 0) {
+            row = layer[y];
+        }
+
+        row[x] = tile;
+        layer[y] = row;
+        layers[l] = layer;
+    }
+}
+
 int Level::newLayer(int tileWidth, int tileHeight) {
     int size = layers.size();
     std::map<int,std::map<int, int>> newMap;
@@ -72,11 +88,25 @@ void Level::render(Camera camera) {
                 int c = it2.first;
                 int t = it2.second;
 
-                int x = (c * layerTileWidth);
-                int y = (r * layerTileHeight);
+                float x = (c * layerTileWidth);
+                float y = (r * layerTileHeight);
 
                 Tile tile = tiles[t];
                 TextureManager::setTex(tile.textureName, tile.r1, tile.c1, tile.r2, tile.c2);
+
+                int texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
+                int texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
+
+                if (texWidth > layerTileWidth) {
+                    int diff = texWidth - layerTileWidth;
+                    x -= 0.5f*(float)diff;
+                }
+
+                if (texHeight > layerTileHeight) {
+                    int diff = texHeight - layerTileHeight;
+                    y -= 0.5f*(float)diff;
+                }
+                
                 TextureManager::drawTex(x, y, 1.0f, camera);
             }
 

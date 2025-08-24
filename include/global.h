@@ -11,6 +11,8 @@ class Global {
         static inline double last_frame_time = 0;
 
         static inline Level *level;
+
+        static inline int debug;
 };
 
 #endif

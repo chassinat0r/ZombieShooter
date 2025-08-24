@@ -3,6 +3,7 @@
 
 #include <constants.h>
 #include <global.h>
+#include <util.h>
 
 #include <algorithm>
 
@@ -64,78 +65,102 @@ void Sprite::update() {
         framesOfAnimation = hitboxes.at(currentAnimation);
         if (framesOfAnimation.count(currentFrame) != 0) {
             std::vector<Rect> frameHitboxes = framesOfAnimation.at(currentFrame);
-            // printf("-----------------\n");
-            for (Rect hb : frameHitboxes) {
-                float realX1 = (x - 0.5f*scale*texWidth) + hb.x1*scale;
-                float realX2 = (x - 0.5f*scale*texWidth) + hb.x2*scale;
-                float realY1 = (y + 0.5f*scale*texHeight) - hb.y1*scale;
-                float realY2 = (y + 0.5f*scale*texHeight) - hb.y2*scale;
-                currentHitboxes.push_back((Rect_F) { realX1, realY1, realX2, realY2 });
-                // debugging
-                // printf("X: %.2f, Y: %.2f\n", x, y);
-                // printf("X1: %.2f, Y1: %.2f, X2: %.2f, Y2: %.2f\n", realX1, realY1, realX2, realY2);
-            }
+            currentHitboxes = getRealHitboxes(frameHitboxes, x, y, texWidth, texHeight, scale);
         }
     }
 
     bool collision = false;
 
     if (solid) {
-        for (Sprite *s : sprites) {
-            if (s->solid && s->getID() != id) {
-                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
-                for (Rect_F hb1 : currentHitboxes) {
-                    for (Rect_F hb2 : otherHitboxes) {
-                        if (std::min(hb1.x2, hb2.x2) > std::max(hb1.x1, hb2.x1) && std::min(hb1.y1, hb2.y1) > std::max(hb1.y2, hb2.y2)) {
-                            collision = true;
-                            break;
-                        }
-                    }
-                    if (collision) { break; }
-                }
-            }
-        }
+        // for (Sprite *s : sprites) {
+        //     if (s->solid && s->getID() != id) {
+        //         std::vector<Rect_F> otherHitboxes = s->getHitboxes();
+        //         collision = doObjectsCollide(currentHitboxes, otherHitboxes);
+        //         if (collision) { break; }
+        //     }
+        // }
 
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
-            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
+            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
+                continue;
+            }
 
+            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
+            
             std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            for (auto rit : layer) {
-                int r = rit.first;
-                std::map<int,int> row = layer[r];
-                for (auto it : row) {
-                    int c = it.first;
-                    int t = it.second;
-                    Tile tile = Global::level->getTile(t);
-                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
-                    if (tile.solid) {
-                        int texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
-                        int texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
+            int left = NULL;
+            int right = NULL;
+            int bottom = NULL;
+            int top = NULL;
 
-                        for (Rect_F hb1 : currentHitboxes) {
-                            for (Rect hb2 : tileHitboxes) {
-                                float realX1 = (c*tileWidth - 0.5f*texWidth) + hb2.x1;
-                                float realX2 = (c*tileWidth - 0.5f*texWidth) + hb2.x2;
-                                float realY1 = (r*tileHeight + 0.5f*texHeight) - hb2.y1;
-                                float realY2 = (r*tileHeight + 0.5f*texHeight) - hb2.y2;
-                                if (std::min(hb1.x2, realX2) > std::max(hb1.x1, realX1) && std::min(hb1.y1, realY1) > std::max(hb1.y2, realY2) && std::find(collisionLayers.begin(), collisionLayers.end(), l) != collisionLayers.end()) {
-                                    collision = true;
-                                    break;
-                                }
-                            }
-                            if (collision) { break; }
-                        }
+            for (Rect_F hb : currentHitboxes) {
+                int tempLeft = std::round(hb.x1 / tileWidth);
+                int tempRight = std::round(hb.x2 / tileWidth);
+                int tempBottom = std::round(hb.y1 / tileWidth);
+                int tempTop = std::round(hb.y2 / tileWidth);
+
+                if (tempLeft < left || left == NULL) {
+                    left = tempLeft;
+                }
+                if (tempRight > right || right == NULL) {
+                    right = tempRight;
+                }
+                if (tempBottom < bottom || bottom == NULL) {
+                    bottom = tempBottom;
+                }
+                if (tempTop > top || top == NULL) {
+                    top = tempTop;
+                }
+            }
+
+            left--;
+            right++;
+            top++;
+            bottom--;
+
+            for (int r = bottom; r <= top; r++) {
+                if (layer.count(r) == 0) {
+                    continue;
+                }
+
+                std::map<int,int> row = layer[r];
+
+                for (int c = left; c <= right; c++) {
+                    if (row.count(c) == 0) {
+                        continue;
+                    }
+                    int t = row[c];
+                    Tile tile = Global::level->getTile(t);
+
+                    if (!tile.solid) {
+                        continue;
+                    }
+
+                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
+                    std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
+                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
+                        collision = true;
                     }
                 }
+
+                if (collision) {
+                    break;
+                }
+            }
+            if (collision) {
+                break;
             }
         }
 
         if (collision) {
             x = lastX;
             y = lastY;
+            // printf("Collision\n");
+        } else {
+            // printf("No collision\n");
         }
     }
 
