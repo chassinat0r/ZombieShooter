@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include <global.h>
+#include <util.h>
 
 void Zombie::setTarget(int id) {
     this->targetId = id;
@@ -91,82 +92,68 @@ void Zombie::getPathToTarget() {
         };
 
         bool collidingWithTile = false;
-
+        
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
+            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
+                continue;
+            }
+
             std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
             
-            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) != collisionLayers.end()) {
-                std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
-                int tileWidth = tileDimensions.first;
-                int tileHeight = tileDimensions.second;
+            std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
+            int tileWidth = tileDimensions.first;
+            int tileHeight = tileDimensions.second;
 
-                int left = (int)std::round(projHb.x1 / tileWidth);
-                int right = (int)std::round(projHb.x2 / tileWidth);
-                int bottom = (int)std::round(projHb.y1 / tileHeight);
-                int top = (int)std::round(projHb.y2 / tileHeight);
+            int left = std::round(projHb.x1 / tileWidth) - 1;
+            int right = std::round(projHb.x2 / tileWidth) + 1;
+            int bottom = std::round(projHb.y1 / tileHeight) - 1;
+            int top = std::round(projHb.y2 / tileHeight) + 1;
 
-                for (int r = bottom; r <= top; r++) {
-                    if (layer.count(r) == 0) {
+            for (int r = bottom; r <= top; r++) {
+                if (layer.count(r) == 0) {
+                    continue;
+                }
+
+                std::map<int,int> row = layer[r];
+
+                for (int c = left; c <= right; c++) {
+                    if (row.count(c) == 0) {
+                        continue;
+                    }
+                    int t = row[c];
+                    Tile tile = Global::level->getTile(t);
+
+                    if (!tile.solid) {
                         continue;
                     }
 
-                    std::map<int,int> row = layer[r];
-
-                    for (int c = left; c <= right; c++) {
-                        if (row.count(c) == 0) {
-                            continue;
-                        }
-
-                        int t = row[c];
-                        Tile tile = Global::level->getTile(t);
-                        int texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
-                        int texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
-
-                        if (!tile.solid) {
-                            continue;
-                        }
-
-                        std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
-                        for (Rect hb : tileHitboxes) {
-                            Rect_F translatedHitbox = { 
-                                (c*tileWidth - 0.5*texWidth) + hb.x1,
-                                (c*tileHeight + 0.5*texHeight) - hb.y1,
-                                (c*tileWidth - 0.5*texWidth) + hb.x2,
-                                (c*tileHeight + 0.5*texHeight) - hb.y2
-                            };
-
-                            float x1 = std::min(translatedHitbox.x1, translatedHitbox.x2);
-                            float x2 = std::max(translatedHitbox.x1, translatedHitbox.x2);
-                            float y1 = std::min(translatedHitbox.y1, translatedHitbox.y2);
-                            float y2 = std::max(translatedHitbox.y1, translatedHitbox.y2);
-
-                            if (std::min(projHb.x2, x2) > std::max(projHb.x1, x1) && std::min(projHb.y2, y2) > std::max(projHb.y1, y1)) {
-                                collidingWithTile = true;
-                                printf("----------------\nTile Collision\nBox (%.2f, %.2f, %.2f, %.2f)\nTile Hitbox (%.2f, %.2f, %.2f, %.2f)\n", projHb.x1, projHb.y1, projHb.x2, projHb.y2, x1, y1, x2, y2);
-                                printf("Block: (%d, %d)\n", c, r);
-                                Global::level->setTile(l, Global::debug, c, r);
-                                break;
-                            }
-                        }
-
-                        if (collidingWithTile) { break; }
-
+                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
+                    std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
+                    if (doObjectsCollide(std::vector<Rect_F> {projHb}, realTileHitboxes)) {
+                        collidingWithTile = true;
                     }
-                    if (collidingWithTile) { break; }
+                }
+
+                if (collidingWithTile) {
+                    break;
                 }
             }
-            if (collidingWithTile) { break; }
+            if (collidingWithTile) {
+                break;
+            }
         }
 
-        if (collidingWithTile) { continue; }
-        
+        if (collidingWithTile) {
+            continue;
+        }
+
         for (Rect_F hb : targetHitboxes) {
             float x1 = std::min(hb.x1, hb.x2);
             float x2 = std::max(hb.x1, hb.x2);
             float y1 = std::min(hb.y1, hb.y2);
             float y2 = std::max(hb.y1, hb.y2);
 
-            if (std::min(projHb.x2, x2) > std::max(projHb.x1, x1) && std::min(projHb.y2, y2) > std::max(projHb.y1, y1)) {
+            if (std::min(projHb.x2, x2) >= std::max(projHb.x1, x1) && std::min(projHb.y2, y2) >= std::max(projHb.y1, y1)) {
                 found = true;
                 break;
             }

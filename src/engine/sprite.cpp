@@ -72,13 +72,13 @@ void Sprite::update() {
     bool collision = false;
 
     if (solid) {
-        // for (Sprite *s : sprites) {
-        //     if (s->solid && s->getID() != id) {
-        //         std::vector<Rect_F> otherHitboxes = s->getHitboxes();
-        //         collision = doObjectsCollide(currentHitboxes, otherHitboxes);
-        //         if (collision) { break; }
-        //     }
-        // }
+        for (Sprite *s : sprites) {
+            if (s->solid && s->getID() != id) {
+                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
+                collision = doObjectsCollide(currentHitboxes, otherHitboxes);
+                if (collision) { break; }
+            }
+        }
 
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
             if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
@@ -232,3 +232,8 @@ void Sprite::addCollisionLayer(int layer) {
 bool Sprite::doesCollideOnLayer(int layer) {
     return std::find(collisionLayers.begin(), collisionLayers.end(), layer) != collisionLayers.end();
 }
+
+bool Sprite::hasMoved() {
+    return (lastX != x || lastY != y);
+}
+

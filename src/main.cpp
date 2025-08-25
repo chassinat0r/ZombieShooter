@@ -124,10 +124,10 @@ void update() {
     zombie->update();
     player->update();
 
-    // if (!route) {
-    //     zombie->getPathToTarget();
-    //     route = true;
-    // }
+    if (!route) {
+        zombie->getPathToTarget();
+        route = true;
+    }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -183,7 +183,7 @@ int main() {
 
     TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
-    player = new Sprite(-45, -20, 1.0f, true);
+    player = new Sprite(-45, -25, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -376,7 +376,7 @@ int main() {
     Global::level->fillLayer(layer, stone, -4, 4, 4, 5);
     Global::level->fillLayer(layer, stone, -4, 4, -3, -4);
     Global::level->fillLayer(layer, stone, 4, 4, 3, -4);
-    // Global::level->fillLayer(layer, stone, -1, -3, 0, -1);
+    Global::level->fillLayer(layer, stone, -1, -3, 0, -1);
     Global::level->fillLayer(layer, stone, -1, 4, 0, 2);
     Global::level->fillLayer(layer, stone, -4, -4, 4, -3);
 

@@ -31,6 +31,8 @@ class Sprite {
         bool isCollidingWith(Sprite sprite);
         std::vector<Rect_F> getHitboxes();
 
+        bool hasMoved();
+        
         bool solid;
 
     protected:
