@@ -250,7 +250,6 @@ bool Sprite::isCollidingWith(Sprite sprite) {
 
         std::vector<std::string> myHbLinks = hitboxLinks[myHbName];
 
-
         for (Rect_F myHb: it.second) {
             for (auto it2 : otherHitboxes) {
                 std::string otherHbName = it2.first;
@@ -293,3 +292,11 @@ bool Sprite::hasMoved() {
     return (lastX != x || lastY != y);
 }
 
+void Sprite::allowHitboxCollision(std::string myHitboxName, std::string otherHitboxName) {
+    std::vector<std::string> hitboxesForName;
+    if (hitboxLinks.count(myHitboxName) > 0) {
+        hitboxesForName = hitboxLinks[myHitboxName];
+    }
+    hitboxesForName.push_back(otherHitboxName);
+    hitboxLinks[myHitboxName] = hitboxesForName;
+}

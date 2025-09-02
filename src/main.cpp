@@ -404,6 +404,12 @@ int main() {
 
     player->setAnimation("front_still");
 
+    player->allowHitboxCollision("leg", "leg");
+    player->allowHitboxCollision("head", "head");
+    player->allowHitboxCollision("torso", "torso");
+    player->allowHitboxCollision("arm", "torso");
+    player->allowHitboxCollision("torso", "arm");
+
     // brick = new Sprite(0, 0, 1.0f, true);
     // Animation stone("stone");
     // stone.addFrame("stone", 0, 0, 1, 1, 200);
@@ -420,8 +426,24 @@ int main() {
     
     zombie->addAnimation("zombie_front_still", zombieFrontStill);
 
-    // zombie->addHitbox("zombie_front_still", 0, 1, 0, 14, 24);
-    // zombie->addHitbox("zombie_front_still", 1, 1, 1, 14, 24);
+    // frame 0
+    zombie->addHitbox("zombie_front_still", "head", 0, 3, 1, 12, 10);
+    zombie->addHitbox("zombie_front_still", "torso", 0, 3, 10, 12, 17);
+    zombie->addHitbox("zombie_front_still", "arm", 0, 1, 11, 3, 17);
+    zombie->addHitbox("zombie_front_still", "arm", 0, 12, 11, 14, 18);
+    zombie->addHitbox("zombie_front_still", "leg", 0, 3, 17, 6, 24);
+    zombie->addHitbox("zombie_front_still", "leg", 0, 9, 17, 12, 24);
+    zombie->addHitbox("zombie_front_still", "crotch", 0, 6, 17, 9, 19);
+
+    // frame 1
+    zombie->addHitbox("zombie_front_still", "head", 1, 3, 2, 12, 11);
+    zombie->addHitbox("zombie_front_still", "torso", 1, 3, 11, 7, 17);
+    zombie->addHitbox("zombie_front_still", "torso", 1, 7, 11, 12, 18);
+    zombie->addHitbox("zombie_front_still", "arm", 1, 1, 11, 3, 17);
+    zombie->addHitbox("zombie_front_still", "arm", 1, 12, 12, 14, 19);
+    zombie->addHitbox("zombie_front_still", "leg", 1, 3, 17, 6, 24);
+    zombie->addHitbox("zombie_front_still", "leg", 1, 9, 18, 12, 24);
+    zombie->addHitbox("zombie_front_still", "crotch", 1, 6, 18, 9, 20);
 
     zombie->setAnimation("zombie_front_still");
 
