@@ -61,12 +61,14 @@ void Sprite::update() {
     
     currentHitboxes.clear();
 
-    if (hitboxes.count(currentAnimation) != 0) {
-        framesOfAnimation = hitboxes.at(currentAnimation);
-        if (framesOfAnimation.count(currentFrame) != 0) {
-            std::vector<Rect> frameHitboxes = framesOfAnimation.at(currentFrame);
-            currentHitboxes = getRealHitboxes(frameHitboxes, x, y, texWidth, texHeight, scale);
+    std::map<std::string, std::vector<Rect>> hitboxesForFrame = animation.getAllHitboxes(currentFrame);
+
+    for (auto it : hitboxesForFrame) {
+        std::vector<Rect_F> hitboxesForName;
+        for (Rect hb : it.second) {
+            hitboxesForName.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
         }
+        currentHitboxes[it.first] = hitboxesForName;
     }
 
     bool collision = false;
@@ -74,8 +76,35 @@ void Sprite::update() {
     if (solid) {
         for (Sprite *s : sprites) {
             if (s->solid && s->getID() != id) {
-                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
-                collision = doObjectsCollide(currentHitboxes, otherHitboxes);
+                std::map<std::string,std::vector<Rect_F>> otherHitboxes = s->getHitboxes();
+                for (auto it : currentHitboxes) {
+                    std::string myHbName = it.first;
+                    if (hitboxLinks.count(myHbName) == 0) {
+                        continue;
+                    }
+
+                    std::vector<std::string> myHbLinks = hitboxLinks[myHbName];
+
+                    for (Rect_F myHb: it.second) {
+                        for (auto it2 : otherHitboxes) {
+                            std::string otherHbName = it2.first;
+
+                            if (std::find(myHbLinks.begin(), myHbLinks.end(), otherHbName) == myHbLinks.end()) {
+                                continue;
+                            }
+
+                            for (Rect_F otherHb: it2.second) {
+                                collision = doHitboxesCollide(myHb, otherHb);
+
+                                if (collision) { break; }
+                            }
+
+                            if (collision) { break; }
+                        }
+                        if (collision) { break; }
+                    }
+                    if (collision) { break; }
+                }
                 if (collision) { break; }
             }
         }
@@ -96,23 +125,25 @@ void Sprite::update() {
             int bottom = NULL;
             int top = NULL;
 
-            for (Rect_F hb : currentHitboxes) {
-                int tempLeft = std::round(hb.x1 / tileWidth);
-                int tempRight = std::round(hb.x2 / tileWidth);
-                int tempBottom = std::round(hb.y1 / tileWidth);
-                int tempTop = std::round(hb.y2 / tileWidth);
+            for (auto it : currentHitboxes) {
+                for (Rect_F hb : it.second) {
+                    int tempLeft = std::round(hb.x1 / tileWidth);
+                    int tempRight = std::round(hb.x2 / tileWidth);
+                    int tempBottom = std::round(hb.y1 / tileWidth);
+                    int tempTop = std::round(hb.y2 / tileWidth);
 
-                if (tempLeft < left || left == NULL) {
-                    left = tempLeft;
-                }
-                if (tempRight > right || right == NULL) {
-                    right = tempRight;
-                }
-                if (tempBottom < bottom || bottom == NULL) {
-                    bottom = tempBottom;
-                }
-                if (tempTop > top || top == NULL) {
-                    top = tempTop;
+                    if (tempLeft < left || left == NULL) {
+                        left = tempLeft;
+                    }
+                    if (tempRight > right || right == NULL) {
+                        right = tempRight;
+                    }
+                    if (tempBottom < bottom || bottom == NULL) {
+                        bottom = tempBottom;
+                    }
+                    if (tempTop > top || top == NULL) {
+                        top = tempTop;
+                    }
                 }
             }
 
@@ -141,7 +172,16 @@ void Sprite::update() {
 
                     std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
                     std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
-                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
+                    
+                    std::vector<Rect_F> currentHitboxesVector;
+
+                    for (auto it : currentHitboxes) {
+                        for (Rect_F hb : it.second) {
+                            currentHitboxesVector.push_back(hb);
+                        }
+                    }
+
+                    if (doObjectsCollide(currentHitboxesVector, realTileHitboxes)) {
                         collision = true;
                     }
                 }
@@ -185,29 +225,45 @@ float Sprite::getX() { return x; }
 
 float Sprite::getY() { return y; }
 
-void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2) {
+void Sprite::addHitbox(std::string animationName, std::string hbName, int frame, int x1, int y1, int x2, int y2) {
     std::map<int, std::vector<Rect>> framesForAnimation;
     std::vector<Rect> hitboxesForFrame;
 
-    if (hitboxes.count(animationName) != 0) {
-        framesForAnimation = hitboxes.at(animationName);
+    if (animations.count(animationName) == 0) {
+        return;
     }
 
-    if (framesForAnimation.count(frame) != 0) {
-        hitboxesForFrame = framesForAnimation.at(frame);
-    }
+    Animation animation = animations[animationName];
 
-    hitboxesForFrame.push_back({ x1, y1, x2, y2 });
-    framesForAnimation[frame] = hitboxesForFrame;
-    hitboxes[animationName] = framesForAnimation;
+    animation.addHitbox(hbName, frame, x1, y1, x2, y2);
+
+    animations[animationName] = animation;
 }
 
 bool Sprite::isCollidingWith(Sprite sprite) {
-    std::vector<Rect_F> otherHitboxes = sprite.getHitboxes();
-    for (Rect_F hb1 : currentHitboxes) {
-        for (Rect_F hb2 : otherHitboxes) {
-            if (std::min(hb1.x2, hb2.x2) > std::max(hb1.x1, hb2.x1) && std::min(hb1.y1, hb2.y1) > std::max(hb1.y2, hb2.y2)) {
-                return true;
+    std::map<std::string,std::vector<Rect_F>> otherHitboxes = sprite.getHitboxes();
+    for (auto it : currentHitboxes) {
+        std::string myHbName = it.first;
+        if (hitboxLinks.count(myHbName) == 0) {
+            continue;
+        }
+
+        std::vector<std::string> myHbLinks = hitboxLinks[myHbName];
+
+
+        for (Rect_F myHb: it.second) {
+            for (auto it2 : otherHitboxes) {
+                std::string otherHbName = it2.first;
+
+                for (Rect_F otherHb: it2.second) {
+                    if (std::find(myHbLinks.begin(), myHbLinks.end(), otherHbName) == myHbLinks.end()) {
+                        continue;
+                    }
+
+                    if (doHitboxesCollide(myHb, otherHb)) {
+                        return true;
+                    }
+                }
             }
         }
     }
@@ -215,7 +271,7 @@ bool Sprite::isCollidingWith(Sprite sprite) {
     return false;
 }
 
-std::vector<Rect_F> Sprite::getHitboxes() {
+std::map<std::string,std::vector<Rect_F>> Sprite::getHitboxes() {
     return currentHitboxes;
 }
 

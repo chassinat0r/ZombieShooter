@@ -28,4 +28,46 @@ Frame Animation::getFrame(int index) {
     if (index < frames.size()) {
         return frames[index];
     }
+
+    return Frame();
+}
+
+void Animation::addHitbox(std::string hbName, int frame, int x1, int y1, int x2, int y2) {
+    std::map<std::string, std::vector<Rect>> frameHitboxes;
+    if (hitboxes.count(frame) > 0) {
+        frameHitboxes = hitboxes[frame];
+    }
+
+    std::vector<Rect> nameHitboxes;
+
+    if (frameHitboxes.count(hbName) > 0) {
+        nameHitboxes = frameHitboxes.at(hbName);
+    }
+
+    nameHitboxes.push_back({x1, y1, x2, y2});
+
+    frameHitboxes[hbName] = nameHitboxes;
+
+    hitboxes[frame] = frameHitboxes;
+}
+
+std::vector<Rect> Animation::getHitboxes(std::string hbName, int frame) {
+    if (hitboxes.count(frame) > 0) {
+        std::map<std::string, std::vector<Rect>> frameHitboxes = hitboxes.at(frame);
+
+        if (frameHitboxes.count(hbName) > 0) {
+            return frameHitboxes.at(hbName);
+        }
+    }
+
+    return std::vector<Rect>();
+}
+
+ std::map<std::string, std::vector<Rect>> Animation::getAllHitboxes(int frame) {
+    if (hitboxes.count(frame) > 0) {
+        std::map<std::string, std::vector<Rect>> frameHitboxes = hitboxes.at(frame);
+        return frameHitboxes;
+    }
+
+    return std::map<std::string, std::vector<Rect>>();
 }

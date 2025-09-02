@@ -19,8 +19,10 @@ class Sprite {
         void move(float dx, float dy);
         virtual void update();
 
-        void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
+        void addHitbox(std::string animationName, std::string hbName, int frame, int x1, int y1, int x2, int y2);
         void addCollisionLayer(int layer);
+        void allowHitboxCollision(std::string myHitboxName, std::string otherHitboxName);
+
         bool doesCollideOnLayer(int layer);
         
         float getX();
@@ -29,7 +31,7 @@ class Sprite {
         int getID();
 
         bool isCollidingWith(Sprite sprite);
-        std::vector<Rect_F> getHitboxes();
+        std::map<std::string,std::vector<Rect_F>> getHitboxes();
 
         bool hasMoved();
         
@@ -41,8 +43,8 @@ class Sprite {
         float scale;
 
         std::map<std::string,Animation> animations;
-        std::map<std::string, std::map<int, std::vector<Rect>>> hitboxes;
-        std::vector<Rect_F> currentHitboxes;
+        std::map<std::string,std::vector<std::string>> hitboxLinks;
+        std::map<std::string,std::vector<Rect_F>> currentHitboxes;
         
         std::string currentAnimation;
         int currentFrame = 0;

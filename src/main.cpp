@@ -124,10 +124,10 @@ void update() {
     zombie->update();
     player->update();
 
-    if (!route) {
-        zombie->getPathToTarget();
-        route = true;
-    }
+    // if (!route) {
+    //     zombie->getPathToTarget();
+    //     route = true;
+    // }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -183,7 +183,7 @@ int main() {
 
     TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
-    player = new Sprite(-45, -25, 1.0f, true);
+    player = new Sprite(-48, 35, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);
@@ -231,112 +231,176 @@ int main() {
     player->addAnimation("right_walk", rightWalk);
 
     // front still
-    // this was for debugging collision, commented it but not deleting it as it may be needed in the future
-    // player->addHitbox("front_still", 0, 0, 0, 16, 25);
-    // player->addHitbox("front_still", 1, 0, 0, 16, 25);
+    // frame 0
+    player->addHitbox("front_still", "head", 0, 3, 0, 12, 9);
+    player->addHitbox("front_still", "torso", 0, 3, 9, 12, 16);
+    player->addHitbox("front_still", "arm", 0, 1, 9, 3, 16);
+    player->addHitbox("front_still", "arm", 0, 12, 9, 14, 16);
+    player->addHitbox("front_still", "leg", 0, 3, 16, 6, 24);
+    player->addHitbox("front_still", "leg", 0, 9, 16, 12, 24);
+    player->addHitbox("front_still", "crotch", 0, 6, 16, 9, 18);
+    // player->addHitbox("front_still", "boundary", 0, 1, 0, 14, 24);
 
-    player->addHitbox("front_still", 0, 3, 0, 12, 9);
-    player->addHitbox("front_still", 0, 1, 9, 14, 16);
-    player->addHitbox("front_still", 0, 3, 16, 12, 24);
-
-    player->addHitbox("front_still", 1, 3, 1, 12, 10);
-    player->addHitbox("front_still", 1, 1, 10, 14, 17);
-    player->addHitbox("front_still", 1, 3, 17, 12, 24);
+    // frame 1
+    player->addHitbox("front_still", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("front_still", "torso", 1, 3, 10, 12, 17);
+    player->addHitbox("front_still", "arm", 1, 1, 10, 3, 17);
+    player->addHitbox("front_still", "arm", 1, 12, 10, 14, 17);
+    player->addHitbox("front_still", "leg", 1, 3, 17, 6, 24);
+    player->addHitbox("front_still", "leg", 1, 9, 17, 12, 24);
+    player->addHitbox("front_still", "crotch", 1, 6, 17, 9, 19);
+    // player->addHitbox("front_still", "boundary", 1, 1, 0, 14, 24);
 
     // back still
-    player->addHitbox("back_still", 0, 3, 0, 12, 9);
-    player->addHitbox("back_still", 0, 1, 9, 14, 16);
-    player->addHitbox("back_still", 0, 3, 16, 12, 24);
+    // frame 0
+    player->addHitbox("back_still", "head", 0, 3, 0, 12, 9);
+    player->addHitbox("back_still", "torso", 0, 3, 9, 12, 16);
+    player->addHitbox("back_still", "arm", 0, 1, 9, 3, 16);
+    player->addHitbox("back_still", "arm", 0, 12, 9, 14, 16);
+    player->addHitbox("back_still", "leg", 0, 3, 16, 6, 24);
+    player->addHitbox("back_still", "leg", 0, 9, 16, 12, 24);
+    player->addHitbox("back_still", "crotch", 0, 6, 16, 9, 18);
+    // player->addHitbox("back_still", "boundary", 0, 1, 0, 14, 24);
 
-    player->addHitbox("back_still", 1, 3, 1, 12, 10);
-    player->addHitbox("back_still", 1, 1, 10, 14, 17);
-    player->addHitbox("back_still", 1, 3, 17, 12, 24);
+    // frame 1
+    player->addHitbox("back_still", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("back_still", "torso", 1, 3, 10, 12, 17);
+    player->addHitbox("back_still", "arm", 1, 1, 10, 3, 17);
+    player->addHitbox("back_still", "arm", 1, 12, 10, 14, 17);
+    player->addHitbox("back_still", "leg", 1, 3, 17, 6, 24);
+    player->addHitbox("back_still", "leg", 1, 9, 17, 12, 24);
+    player->addHitbox("back_still", "crotch", 1, 6, 17, 9, 19);
+    // player->addHitbox("back_still", "boundary", 1, 1, 0, 14, 24);
 
     // right still
-    player->addHitbox("right_still", 0, 3, 0, 12, 9);
-    player->addHitbox("right_still", 0, 6, 9, 10, 24);
+    // frame 0
+    player->addHitbox("right_still", "head", 0, 3, 0, 12, 9);
+    player->addHitbox("right_still", "torso", 0, 6, 9, 10, 16);
+    player->addHitbox("right_still", "arm", 0, 8, 10, 9, 15);
+    player->addHitbox("right_still", "leg", 0, 6, 16, 10, 24);
+    // player->addHitbox("right_still", "boundary", 0, 1, 0, 14, 24);
 
-    player->addHitbox("right_still", 1, 3, 1, 12, 10);
-    player->addHitbox("right_still", 1, 6, 10, 10, 24);
+    // frame 1
+    player->addHitbox("right_still", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("right_still", "torso", 1, 6, 10, 10, 17);
+    player->addHitbox("right_still", "arm", 1, 8, 11, 9, 16);
+    player->addHitbox("right_still", "leg", 1, 6, 17, 10, 24);
+    // player->addHitbox("right_still", "boundary", 1, 1, 0, 14, 24);
 
-    // left still first frame
-    player->addHitbox("left_still", 0, 3, 0, 12, 9);
-    player->addHitbox("left_still", 0, 5, 9, 9, 24);
-    // second frame
-    player->addHitbox("left_still", 1, 3, 1, 12, 10);
-    player->addHitbox("left_still", 1, 5, 10, 9, 24);
+    // left still
+    // frame 0
+    player->addHitbox("left_still", "head", 0, 3, 0, 12, 9);
+    player->addHitbox("left_still", "torso", 0, 5, 9, 9, 16);
+    player->addHitbox("left_still", "arm", 0, 6, 10, 7, 15);
+    player->addHitbox("left_still", "leg", 0, 5, 16, 9, 24);
+    // player->addHitbox("left_still", "boundary", 0, 1, 0, 14, 24);
+
+    // frame 1
+    player->addHitbox("left_still", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("left_still", "torso", 1, 5, 10, 9, 17);
+    player->addHitbox("left_still", "arm", 1, 6, 11, 7, 16);
+    player->addHitbox("left_still", "leg", 1, 5, 17, 9, 24);
+    // player->addHitbox("left_still", "boundary", 1, 1, 0, 14, 24);
 
     // front walk
-    // frame 1
-    player->addHitbox("front_walk", 0, 3, 1, 12, 10);
-    player->addHitbox("front_walk", 0, 1, 10, 12, 16);
-    player->addHitbox("front_walk", 0, 12, 10, 14, 14);
-    player->addHitbox("front_walk", 0, 3, 16, 7, 22);
-    player->addHitbox("front_walk", 0, 8, 16, 12, 24);
+    // frame 0
+    player->addHitbox("front_walk", "head", 0, 3, 1, 12, 10);
+    player->addHitbox("front_walk", "torso", 0, 3, 10, 12, 16);
+    player->addHitbox("front_walk", "arm", 0, 1, 10, 3, 16);
+    player->addHitbox("front_walk", "arm", 0, 12, 10, 14, 14);
+    player->addHitbox("front_walk", "leg", 0, 3, 16, 6, 22);
+    player->addHitbox("front_walk", "leg", 0, 9, 16, 12, 24);
+    player->addHitbox("front_walk", "crotch", 0, 6, 16, 9, 18);
+    // player->addHitbox("front_walk", "boundary", 0, 1, 0, 14, 24);
 
-    // frame 2
-    player->addHitbox("front_walk", 1, 3, 1, 12, 10);
-    player->addHitbox("front_walk", 1, 1, 10, 3, 14);
-    player->addHitbox("front_walk", 1, 3, 10, 14, 16);
-    player->addHitbox("front_walk", 1, 3, 16, 7, 24);
-    player->addHitbox("front_walk", 1, 8, 16, 12, 22);
+    // frame 1
+    player->addHitbox("front_walk", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("front_walk", "torso", 1, 3, 10, 12, 16);
+    player->addHitbox("front_walk", "arm", 1, 1, 10, 3, 14);
+    player->addHitbox("front_walk", "arm", 1, 12, 10, 14, 16);
+    player->addHitbox("front_walk", "leg", 1, 3, 16, 6, 24);
+    player->addHitbox("front_walk", "leg", 1, 9, 16, 12, 22);
+    player->addHitbox("front_walk", "crotch", 1, 6, 16, 9, 18);
+    // player->addHitbox("front_walk", "boundary", 1, 1, 0, 14, 24);
 
     // back walk
-    // frame 1
-    player->addHitbox("back_walk", 0, 3, 1, 12, 10);
-    player->addHitbox("back_walk", 0, 1, 10, 12, 16);
-    player->addHitbox("back_walk", 0, 12, 10, 14, 14);
-    player->addHitbox("back_walk", 0, 3, 16, 7, 22);
-    player->addHitbox("back_walk", 0, 8, 16, 12, 24);
+    // frame 0
+    player->addHitbox("back_walk", "head", 0, 3, 1, 12, 10);
+    player->addHitbox("back_walk", "torso", 0, 3, 10, 12, 16);
+    player->addHitbox("back_walk", "arm", 0, 1, 10, 3, 16);
+    player->addHitbox("back_walk", "arm", 0, 12, 10, 14, 14);
+    player->addHitbox("back_walk", "leg", 0, 3, 16, 6, 22);
+    player->addHitbox("back_walk", "leg", 0, 9, 16, 12, 24);
+    player->addHitbox("back_walk", "crotch", 0, 6, 16, 9, 18);
+    // player->addHitbox("back_walk", "boundary", 0, 1, 0, 14, 24);
 
-    // frame 2
-    player->addHitbox("back_walk", 1, 3, 1, 12, 10);
-    player->addHitbox("back_walk", 1, 1, 10, 3, 14);
-    player->addHitbox("back_walk", 1, 3, 10, 14, 16);
-    player->addHitbox("back_walk", 1, 3, 16, 7, 24);
-    player->addHitbox("back_walk", 1, 8, 16, 12, 22);
+    // frame 1
+    player->addHitbox("back_walk", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("back_walk", "torso", 1, 3, 10, 12, 16);
+    player->addHitbox("back_walk", "arm", 1, 1, 10, 3, 14);
+    player->addHitbox("back_walk", "arm", 1, 12, 10, 14, 16);
+    player->addHitbox("back_walk", "leg", 1, 3, 16, 6, 24);
+    player->addHitbox("back_walk", "leg", 1, 9, 16, 12, 22);
+    player->addHitbox("back_walk", "crotch", 1, 6, 16, 9, 18);
+    // player->addHitbox("back_walk", "boundary", 1, 1, 0, 14, 24);
 
     // left walk
+    // frame 0
+    player->addHitbox("left_walk", "head", 0, 3, 1, 12, 10);
+    player->addHitbox("left_walk", "torso", 0, 5, 10, 9, 16);
+    player->addHitbox("left_walk", "arm", 0, 3, 13, 5, 15);
+    player->addHitbox("left_walk", "leg", 0, 5, 16, 10, 24);
+    // player->addHitbox("left_walk", "boundary", 0, 1, 0, 14, 24);
+
     // frame 1
-    player->addHitbox("left_walk", 0, 3, 1, 12, 10);
-    player->addHitbox("left_walk", 0, 4, 10, 10, 17);
-    player->addHitbox("left_walk", 0, 5, 17, 9, 21);
-    player->addHitbox("left_walk", 0, 5, 21, 11, 24);
+    player->addHitbox("left_walk", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("left_walk", "torso", 1, 5, 10, 9, 17);
+    player->addHitbox("left_walk", "arm", 1, 6, 11, 7, 16);
+    player->addHitbox("left_walk", "leg", 1, 5, 17, 9, 24);
+    // player->addHitbox("left_walk", "boundary", 1, 1, 0, 14, 24);
 
     // frame 2
-    player->addHitbox("left_walk", 1, 3, 1, 12, 10);
-    player->addHitbox("left_walk", 1, 5, 10, 9, 24);
+    player->addHitbox("left_walk", "head", 2, 3, 1, 12, 10);
+    player->addHitbox("left_walk", "torso", 2, 5, 10, 9, 17);
+    player->addHitbox("left_walk", "arm", 2, 7, 12, 10, 15);
+    player->addHitbox("left_walk", "leg", 2, 4, 16, 9, 24);
+    // player->addHitbox("left_walk", "boundary", 2, 1, 0, 14, 24);
 
     // frame 3
-    player->addHitbox("left_walk", 2, 3, 1, 12, 10);
-    player->addHitbox("left_walk", 2, 4, 10, 10, 16);
-    player->addHitbox("left_walk", 2, 5, 16, 9, 22);
-    player->addHitbox("left_walk", 2, 3, 22, 9, 24);
-
-    // frame 4
-    player->addHitbox("left_walk", 3, 3, 1, 12, 10);
-    player->addHitbox("left_walk", 3, 5, 10, 9, 24);
+    player->addHitbox("left_walk", "head", 3, 3, 1, 12, 10);
+    player->addHitbox("left_walk", "torso", 3, 5, 10, 9, 17);
+    player->addHitbox("left_walk", "arm", 3, 6, 11, 7, 16);
+    player->addHitbox("left_walk", "leg", 3, 5, 17, 9, 24);
+    // player->addHitbox("left_walk", "boundary", 3, 1, 0, 14, 24);
 
     // right walk
+    // frame 0
+    player->addHitbox("right_walk", "head", 0, 3, 1, 12, 10);
+    player->addHitbox("right_walk", "torso", 0, 6, 10, 10, 16);
+    player->addHitbox("right_walk", "arm", 0, 10, 13, 12, 15);
+    player->addHitbox("right_walk", "leg", 0, 5, 16, 10, 24);
+    // player->addHitbox("right_walk", "boundary", 0, 1, 0, 14, 24);
+
     // frame 1
-    player->addHitbox("right_walk", 0, 3, 1, 12, 10);
-    player->addHitbox("right_walk", 0, 5, 10, 11, 17);
-    player->addHitbox("right_walk", 0, 6, 17, 9, 21);
-    player->addHitbox("right_walk", 0, 4, 21, 10, 24);
+    player->addHitbox("right_walk", "head", 1, 3, 1, 12, 10);
+    player->addHitbox("right_walk", "torso", 1, 6, 10, 10, 17);
+    player->addHitbox("right_walk", "arm", 1, 8, 11, 9, 16);
+    player->addHitbox("right_walk", "leg", 1, 6, 17, 10, 24);
+    // player->addHitbox("right_walk", "boundary", 1, 1, 0, 14, 24);
 
     // frame 2
-    player->addHitbox("right_walk", 1, 3, 1, 12, 10);
-    player->addHitbox("right_walk", 1, 6, 10, 10, 24);
+    player->addHitbox("right_walk", "head", 2, 3, 1, 12, 10);
+    player->addHitbox("right_walk", "torso", 2, 6, 10, 10, 16);
+    player->addHitbox("right_walk", "arm", 2, 5, 12, 7, 15);
+    player->addHitbox("right_walk", "leg", 2, 6, 16, 11, 24);
+    // player->addHitbox("right_walk", "boundary", 2, 1, 0, 14, 24);
 
     // frame 3
-    player->addHitbox("right_walk", 2, 3, 1, 12, 10);
-    player->addHitbox("right_walk", 2, 6, 10, 11, 16);
-    player->addHitbox("right_walk", 2, 6, 16, 10, 22);
-    player->addHitbox("right_walk", 2, 6, 22, 12, 24);
-
-    // frame 4
-    player->addHitbox("right_walk", 3, 3, 1, 12, 10);
-    player->addHitbox("right_walk", 3, 6, 10, 10, 24);
+    player->addHitbox("right_walk", "head", 3, 3, 1, 12, 10);
+    player->addHitbox("right_walk", "torso", 3, 6, 10, 10, 17);
+    player->addHitbox("right_walk", "arm", 3, 8, 11, 9, 16);
+    player->addHitbox("right_walk", "leg", 3, 6, 17, 10, 24);
+    // player->addHitbox("right_walk", "boundary", 3, 1, 0, 14, 24);
 
     player->setAnimation("front_still");
 
@@ -356,8 +420,8 @@ int main() {
     
     zombie->addAnimation("zombie_front_still", zombieFrontStill);
 
-    zombie->addHitbox("zombie_front_still", 0, 1, 0, 14, 24);
-    zombie->addHitbox("zombie_front_still", 1, 1, 1, 14, 24);
+    // zombie->addHitbox("zombie_front_still", 0, 1, 0, 14, 24);
+    // zombie->addHitbox("zombie_front_still", 1, 1, 1, 14, 24);
 
     zombie->setAnimation("zombie_front_still");
 
