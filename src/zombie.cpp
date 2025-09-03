@@ -52,135 +52,171 @@ void Zombie::update() {
 }
 
 void Zombie::getPathToTarget() {
-    // path = std::stack<Pos_F>();
-    // Sprite *target;
-    // for (Sprite *s : Sprite::sprites) {
-    //     if (s->getID() == targetId) {
-    //         target = s;
-    //         break;
-    //     }
-    // }
+    path = std::stack<Pos_F>();
+    Sprite clone = *this;
+    clone.setSolid(false);
+    clone.setAnimation("zombie_front_still");
 
-    // std::vector<Rect_F> targetHitboxes = target->getHitboxes();
+    Sprite *target;
+    for (Sprite *s : Sprite::sprites) {
+        if (s->getID() == targetId) {
+            target = s;
+            break;
+        }
+    }
+
+    std::map<std::string,std::vector<Rect_F>> targetHitboxes = target->getHitboxes();
     
-    // std::pair<float,float> start = { x, y }; // Get starting position of 
-    // std::queue<std::pair<float,float>> frontier;
-    // frontier.push(start);
+    std::pair<float,float> start = { x, y }; // Get starting position of 
+    std::queue<std::pair<float,float>> frontier;
+    frontier.push(start);
 
-    // std::map<std::pair<float,float>,std::pair<float,float>> cameFrom;
-    // cameFrom.insert({{x, y}, {0, 0}});
+    std::map<std::pair<float,float>,std::pair<float,float>> cameFrom;
+    cameFrom.insert({{x, y}, {0, 0}});
     
-    // std::pair<float,float> current;
+    std::pair<float,float> current;
     
-    // bool found = false;
-    // Animation animation = animations[currentAnimation];
-    // Frame currentFrameObj = animation.getFrame(currentFrame);
+    bool found = false;
+    Animation animation = animations[currentAnimation];
+    Frame currentFrameObj = animation.getFrame(currentFrame);
 
-    // float texWidth = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
-    // float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
+    float texWidth = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
+    float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
 
-    // while (!frontier.empty()) {
-    //     current = frontier.front();
-    //     frontier.pop();
+    while (!frontier.empty()) {
+        current = frontier.front();
+        frontier.pop();
             
-    //     float cx = current.first;
-    //     float cy = current.second;
+        float cx = current.first;
+        float cy = current.second;
 
-    //     Rect_F projHb = { 
-    //         cx - 0.5f*scale*texWidth, cy - 0.5f*scale*texHeight,
-    //         cx + 0.5f*scale*texWidth, cy + 0.5f*scale*texHeight,
-    //     };
+        clone.setPos(cx, cy);
+        clone.update();
 
-    //     bool collidingWithTile = false;
+        std::map<std::string,std::vector<Rect_F>> projectedHitboxes = clone.getHitboxes();
+        std::vector<Rect_F> projectedHitboxesVec = getHitboxVector(projectedHitboxes);
+
+        for (Rect_F hb : projectedHitboxesVec) {
+            printf("%.2f %.2f %.2f %.2f\n", hb.x1, hb.y1, hb.x2, hb.y2);
+        }
+
+        if (projectedHitboxesVec.size() == 0) { return; }
+
+
+        bool collidingWithTile = false;
         
-    //     for (int l = 0; l < Global::level->getLayerCount(); l++) {
-    //         if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
-    //             continue;
-    //         }
+        for (int l = 0; l < Global::level->getLayerCount(); l++) {
+            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
+                continue;
+            }
 
-    //         std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
+            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
             
-    //         std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
-    //         int tileWidth = tileDimensions.first;
-    //         int tileHeight = tileDimensions.second;
+            std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
+            int tileWidth = tileDimensions.first;
+            int tileHeight = tileDimensions.second;
 
-    //         int left = std::round(projHb.x1 / tileWidth) - 1;
-    //         int right = std::round(projHb.x2 / tileWidth) + 1;
-    //         int bottom = std::round(projHb.y1 / tileHeight) - 1;
-    //         int top = std::round(projHb.y2 / tileHeight) + 1;
+            int left;
+            int right;
+            int bottom;
+            int top;
 
-    //         for (int r = bottom; r <= top; r++) {
-    //             if (layer.count(r) == 0) {
-    //                 continue;
-    //             }
+            bool leftDefined = false;
+            bool rightDefined = false;
+            bool bottomDefined = false;
+            bool topDefined = false;
 
-    //             std::map<int,int> row = layer[r];
+            for (Rect_F projHb : projectedHitboxesVec) {
+                int tempLeft = std::round(projHb.x1 / tileWidth);
+                int tempRight = std::round(projHb.x2 / tileWidth);
+                int tempBottom = std::round(projHb.y1 / tileHeight);
+                int tempTop = std::round(projHb.y2 / tileHeight);
 
-    //             for (int c = left; c <= right; c++) {
-    //                 if (row.count(c) == 0) {
-    //                     continue;
-    //                 }
-    //                 int t = row[c];
-    //                 Tile tile = Global::level->getTile(t);
+                if (tempLeft < left || !leftDefined) {
+                    left = tempLeft;
+                    leftDefined = true;
+                }
+                if (tempRight > right || !rightDefined) {
+                    right = tempRight;
+                    rightDefined = true;
+                }
+                if (tempBottom < bottom || !bottomDefined) {
+                    bottom = tempBottom;
+                    bottomDefined = true;
+                }
+                if (tempTop > top || !topDefined) {
+                    top = tempTop;
+                    topDefined = true;
+                }
+            }
 
-    //                 if (!tile.solid) {
-    //                     continue;
-    //                 }
+            left--;
+            right++;
+            bottom--;
+            top++;
 
-    //                 std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
-    //                 std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
-    //                 if (doObjectsCollide(std::vector<Rect_F> {projHb}, realTileHitboxes)) {
-    //                     collidingWithTile = true;
-    //                 }
-    //             }
+            for (int r = bottom; r <= top; r++) {
+                if (layer.count(r) == 0) {
+                    continue;
+                }
 
-    //             if (collidingWithTile) {
-    //                 break;
-    //             }
-    //         }
-    //         if (collidingWithTile) {
-    //             break;
-    //         }
-    //     }
+                std::map<int,int> row = layer[r];
 
-    //     if (collidingWithTile) {
-    //         continue;
-    //     }
+                for (int c = left; c <= right; c++) {
+                    if (row.count(c) == 0) {
+                        continue;
+                    }
+                    int t = row[c];
+                    Tile tile = Global::level->getTile(t);
 
-    //     for (Rect_F hb : targetHitboxes) {
-    //         float x1 = std::min(hb.x1, hb.x2);
-    //         float x2 = std::max(hb.x1, hb.x2);
-    //         float y1 = std::min(hb.y1, hb.y2);
-    //         float y2 = std::max(hb.y1, hb.y2);
+                    if (!tile.solid) {
+                        continue;
+                    }
 
-    //         if (std::min(projHb.x2, x2) >= std::max(projHb.x1, x1) && std::min(projHb.y2, y2) >= std::max(projHb.y1, y1)) {
-    //             found = true;
-    //             break;
-    //         }
-    //     }
+                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
+                    std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
+                    if (doObjectsCollide(projectedHitboxesVec, realTileHitboxes)) {
+                        collidingWithTile = true;
+                    }
+                }
 
-    //     if (found) {
-    //         break;
-    //     }
+                if (collidingWithTile) {
+                    break;
+                }
+            }
+            if (collidingWithTile) {
+                break;
+            }
+        }
 
-    //     // calculate graph neighbours
-    //     std::pair<float,float> potentialNeighbours[] = {{cx - 4.0f, cy}, {cx + 4.0f, cy}, {cx, cy - 4.0f}, {cx, cy + 4.0f}};
+        if (collidingWithTile) {
+            continue;
+        }
 
-    //     for (std::pair<float,float> neighbour : potentialNeighbours) {
-    //         if (cameFrom.find(neighbour) == cameFrom.end()) {
-    //             frontier.push(neighbour);
+        if (clone.isCollidingWith(*target)) {
+            found = true;
+            break;
+        }
 
-    //             cameFrom.insert({neighbour, current});
-    //         }
-    //     }
-    // }
-    // if (found) {
-    //     while (true) {
-    //         current = cameFrom[current];
-    //         // printf("X: %.2f, Y: %.2f\n", current.first, current.second);
-    //         if (current == start) { break; }
-    //         path.push({current.first, current.second});
-    //     }
-    // }
+        // calculate graph neighbours
+        std::pair<float,float> potentialNeighbours[] = {{cx - 4.0f, cy}, {cx + 4.0f, cy}, {cx, cy - 4.0f}, {cx, cy + 4.0f}};
+
+        for (std::pair<float,float> neighbour : potentialNeighbours) {
+            if (cameFrom.find(neighbour) == cameFrom.end()) {
+                frontier.push(neighbour);
+
+                cameFrom.insert({neighbour, current});
+            }
+        }
+    }
+    if (found) {
+        printf("Target found\n");
+        while (true) {
+            current = cameFrom[current];
+            // printf("X: %.2f, Y: %.2f\n", current.first, current.second);
+            if (current == start) { break; }
+            path.push({current.first, current.second});
+        }
+    }
 }
 

@@ -13,14 +13,16 @@ Sprite::Sprite() {
 
 }
 
-Sprite::Sprite(float x, float y, float scale, bool solid) {
+Sprite::Sprite(float x, float y, float scale, bool solid, bool dud) {
     this->x = x;
     this->y = y;
     this->scale = scale;
     this->solid = solid;
-    this->id = count;
-    count++;
-    sprites.push_back(this);
+    if (!dud) {
+        this->id = count;
+        count++;
+        sprites.push_back(this);
+    }
 }
 
 void Sprite::addAnimation(std::string name, Animation animation) {
@@ -299,4 +301,13 @@ void Sprite::allowHitboxCollision(std::string myHitboxName, std::string otherHit
     }
     hitboxesForName.push_back(otherHitboxName);
     hitboxLinks[myHitboxName] = hitboxesForName;
+}
+
+void Sprite::setPos(float x, float y) {
+    this->x = x;
+    this->y = y;
+}
+
+void Sprite::setSolid(bool solid) {
+    this->solid = solid;
 }

@@ -124,10 +124,10 @@ void update() {
     zombie->update();
     player->update();
 
-    // if (!route) {
-    //     zombie->getPathToTarget();
-    //     route = true;
-    // }
+    if (!route) {
+        zombie->getPathToTarget();
+        route = true;
+    }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -446,6 +446,12 @@ int main() {
     zombie->addHitbox("zombie_front_still", "crotch", 1, 6, 18, 9, 20);
 
     zombie->setAnimation("zombie_front_still");
+
+    zombie->allowHitboxCollision("leg", "leg");
+    zombie->allowHitboxCollision("head", "head");
+    zombie->allowHitboxCollision("torso", "torso");
+    zombie->allowHitboxCollision("arm", "torso");
+    zombie->allowHitboxCollision("torso", "arm");
 
     Global::level = new Level();
 

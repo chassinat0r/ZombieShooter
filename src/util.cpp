@@ -96,3 +96,13 @@ std::vector<Rect_F> getRealHitboxes(std::vector<Rect> objHitboxes, float x, floa
 
 	return realHitboxes;
 }
+
+std::vector<Rect_F> getHitboxVector(std::map<std::string,std::vector<Rect_F>> hitboxes) {
+	std::vector<Rect_F> hbVec;
+	for (auto it : hitboxes) {
+		for (Rect_F hb : it.second) {
+			hbVec.push_back(hb);
+		}
+	}
+	return hbVec;
+}
