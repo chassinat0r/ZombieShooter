@@ -96,10 +96,6 @@ void Zombie::getPathToTarget() {
         std::map<std::string,std::vector<Rect_F>> projectedHitboxes = clone.getHitboxes();
         std::vector<Rect_F> projectedHitboxesVec = getHitboxVector(projectedHitboxes);
 
-        for (Rect_F hb : projectedHitboxesVec) {
-            printf("%.2f %.2f %.2f %.2f\n", hb.x1, hb.y1, hb.x2, hb.y2);
-        }
-
         if (projectedHitboxesVec.size() == 0) { return; }
 
 
@@ -210,7 +206,6 @@ void Zombie::getPathToTarget() {
         }
     }
     if (found) {
-        printf("Target found\n");
         while (true) {
             current = cameFrom[current];
             // printf("X: %.2f, Y: %.2f\n", current.first, current.second);
