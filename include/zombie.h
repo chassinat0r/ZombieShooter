@@ -16,7 +16,7 @@ class Zombie : public Sprite {
         void getPathToTarget();
 
     private:
-        int targetId = NULL;
+        int targetId;
 
         std::stack<Pos_F> path;
 };

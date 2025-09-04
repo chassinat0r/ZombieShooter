@@ -122,10 +122,15 @@ void Sprite::update() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            int left = NULL;
-            int right = NULL;
-            int bottom = NULL;
-            int top = NULL;
+            int left;
+            int right;
+            int bottom;
+            int top;
+
+            bool leftDefined = false;
+            bool rightDefined = false;
+            bool bottomDefined = false;
+            bool topDefined = false;
 
             for (auto it : currentHitboxes) {
                 for (Rect_F hb : it.second) {
@@ -134,17 +139,21 @@ void Sprite::update() {
                     int tempBottom = std::round(hb.y1 / tileWidth);
                     int tempTop = std::round(hb.y2 / tileWidth);
 
-                    if (tempLeft < left || left == NULL) {
+                    if (tempLeft < left || !leftDefined) {
                         left = tempLeft;
+                        leftDefined = true;
                     }
-                    if (tempRight > right || right == NULL) {
+                    if (tempRight > right || !rightDefined) {
                         right = tempRight;
+                        rightDefined = true;
                     }
-                    if (tempBottom < bottom || bottom == NULL) {
+                    if (tempBottom < bottom || !bottomDefined) {
                         bottom = tempBottom;
+                        bottomDefined = true;
                     }
-                    if (tempTop > top || top == NULL) {
+                    if (tempTop > top || !topDefined) {
                         top = tempTop;
+                        topDefined = true;
                     }
                 }
             }

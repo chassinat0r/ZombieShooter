@@ -98,7 +98,6 @@ void Zombie::getPathToTarget() {
 
         if (projectedHitboxesVec.size() == 0) { return; }
 
-
         bool collidingWithTile = false;
         
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
