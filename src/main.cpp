@@ -33,6 +33,35 @@ bool route = false;
 
 Camera camera = {0, 0, 0};
 
+void quickSort(std::vector<Sprite*> *vec, int start, int end) {
+    if (end <= start) { return; }
+
+	int i = -1;
+	int j = 0;
+
+	int pivot = vec->at(end)->getY();
+
+	while (j < end) {
+		if (vec->at(j)->getY() > pivot) {
+			i++;
+			Sprite *temp = vec->at(j);
+			vec->at(j) = vec->at(i);
+			vec->at(i) = temp;
+		}
+
+		j++;
+	}
+
+	i++;
+
+	Sprite *temp = vec->at(i);
+	vec->at(i) = vec->at(end);
+	vec->at(end) = temp;
+
+	quickSort(vec, start, i-1);
+	quickSort(vec, i+1, end);
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
     Global::width = w;
     Global::height = h;
@@ -141,8 +170,14 @@ void draw() {
 
     // brick->draw(camera);
     Global::level->render(camera);
-    zombie->draw(camera);
-    player->draw(camera);
+
+    std::vector<Sprite*> sorted = Sprite::sprites;
+
+    quickSort(&sorted, 0, sorted.size()-1);
+    
+    for (Sprite *s : sorted) {
+        s->draw(camera);
+    }
 
     glfwSwapBuffers(window);
 }

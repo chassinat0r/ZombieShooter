@@ -37,7 +37,9 @@ class Sprite {
         std::map<std::string,std::vector<Rect_F>> getHitboxes();
 
         bool hasMoved();
-        
+            
+        inline static std::vector<Sprite*> sprites;
+
         bool solid;
 
     protected:
@@ -54,7 +56,6 @@ class Sprite {
         double timer = 0;
         double lastUpdate = 0;
 
-        inline static std::vector<Sprite*> sprites;
         inline static int count = 0;
         int id;
 
