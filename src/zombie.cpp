@@ -10,28 +10,42 @@ void Zombie::setTarget(int id) {
 }
 
 void Zombie::update() {
-    Pos_F nextStep;
-    Pos_F direction = {0.0f, 0.0f};
-    
-    if (path.size() > 0) {
-        nextStep = path.top();
-        if (x < nextStep.x) {
-            direction.x = 1.0f;
-        } else if (x > nextStep.x) {
-            direction.x = -1.0f;
-        } else if (y < nextStep.y) {
-            direction.y = 1.0f;
-        } else if (y > nextStep.y) {
-            direction.y = -1.0f;
+    Sprite *target;
+    for (Sprite *s : Sprite::sprites) {
+        if (s->getID() == targetId) {
+            target = s;
+            break;
         }
+    }
 
-        velocityX += direction.x*16.0f;
-        velocityY += direction.y*16.0f;
+    bool findPath = false;
+    
+    Pos_F direction = {0.0f, 0.0f};
+    Pos_F nextStep;
+
+    if (!isCollidingWith(*target)) {
+        findPath = true;
+    
+        if (path.size() > 0) {
+            nextStep = path.top();
+            if (x < nextStep.x) {
+                direction.x = 1.0f;
+            } else if (x > nextStep.x) {
+                direction.x = -1.0f;
+            } else if (y < nextStep.y) {
+                direction.y = 1.0f;
+            } else if (y > nextStep.y) {
+                direction.y = -1.0f;
+            }
+
+            velocityX += direction.x*13.0f;
+            velocityY += direction.y*13.0f;
+        }
     }
 
     Sprite::update();
 
-    if (path.size() > 0) {
+    if (path.size() > 0 && findPath) {
         if (direction.x == 1.0f && x >= nextStep.x) {
             x = nextStep.x;
             path.pop();
@@ -52,7 +66,9 @@ void Zombie::update() {
 }
 
 void Zombie::getPathToTarget() {
-    path = std::stack<Pos_F>();
+    while(!path.empty()) {
+        path.pop();
+    }
     Sprite clone = *this;
     clone.setSolid(false);
     clone.setAnimation("zombie_front_still");
@@ -63,6 +79,10 @@ void Zombie::getPathToTarget() {
             target = s;
             break;
         }
+    }
+
+    if (isCollidingWith(*target)) {
+        return;
     }
 
     std::map<std::string,std::vector<Rect_F>> targetHitboxes = target->getHitboxes();
@@ -207,8 +227,8 @@ void Zombie::getPathToTarget() {
     if (found) {
         while (true) {
             current = cameFrom[current];
-            // printf("X: %.2f, Y: %.2f\n", current.first, current.second);
-            if (current == start) { break; }
+            if (current == start || cameFrom[current] == current) { break; }
+    
             path.push({current.first, current.second});
         }
     }
