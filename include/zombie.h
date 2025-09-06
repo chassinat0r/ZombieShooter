@@ -15,10 +15,17 @@ class Zombie : public Sprite {
         void setTarget(int id);
         void getPathToTarget();
 
+        bool targetMovedFromDestination();
+
     private:
         int targetId;
 
         std::stack<Pos_F> path;
+
+        Sprite* getTarget();
+
+        Pos_F end;
+        bool endDefined = false;
 };
 
 #endif

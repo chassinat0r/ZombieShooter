@@ -9,7 +9,7 @@ void Zombie::setTarget(int id) {
     this->targetId = id;
 }
 
-void Zombie::update() {
+Sprite* Zombie::getTarget() {
     Sprite *target;
     for (Sprite *s : Sprite::sprites) {
         if (s->getID() == targetId) {
@@ -17,6 +17,12 @@ void Zombie::update() {
             break;
         }
     }
+
+    return target;
+}
+
+void Zombie::update() {
+    Sprite *target = getTarget();
 
     bool findPath = false;
     
@@ -73,13 +79,7 @@ void Zombie::getPathToTarget() {
     clone.setSolid(false);
     clone.setAnimation("zombie_front_still");
 
-    Sprite *target;
-    for (Sprite *s : Sprite::sprites) {
-        if (s->getID() == targetId) {
-            target = s;
-            break;
-        }
-    }
+    Sprite *target = getTarget();
 
     if (isCollidingWith(*target)) {
         return;
@@ -225,6 +225,9 @@ void Zombie::getPathToTarget() {
         }
     }
     if (found) {
+        end.x = current.first;
+        end.y = current.second;
+        endDefined = true;
         while (true) {
             current = cameFrom[current];
             if (current == start || cameFrom[current] == current) { break; }
@@ -234,3 +237,19 @@ void Zombie::getPathToTarget() {
     }
 }
 
+bool Zombie::targetMovedFromDestination() {
+    if (!endDefined) {
+        return true;
+    }
+
+    Sprite clone = *this;
+    clone.setSolid(false);
+    clone.setAnimation("zombie_front_still");
+
+    clone.setPos(end.x, end.y);
+    clone.update();
+
+    Sprite *target = getTarget();
+
+    return !clone.isCollidingWith(*target);
+}

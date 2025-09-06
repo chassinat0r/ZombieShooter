@@ -29,8 +29,6 @@ GLFWwindow* window;
 Sprite *player;
 Zombie *zombie;
 
-bool route = false;
-
 Camera camera = {0, 0, 0};
 
 void quickSort(std::vector<Sprite*> *vec, int start, int end) {
@@ -152,9 +150,8 @@ void update() {
     zombie->update();
     player->update();
 
-    if (player->hasMoved() || !route) {
+    if (zombie->targetMovedFromDestination()) {
         zombie->getPathToTarget();
-        route = true;
     }
 
     camera.x = (int)player->getX();
@@ -216,7 +213,7 @@ int main() {
 
     TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
 
-    player = new Sprite(-48, 35, 1.0f, true);
+    player = new Sprite(-48, 30, 1.0f, true);
     Animation frontStill("front_still");
     frontStill.addFrame("player", 0, 0, 1, 1, 700);
     frontStill.addFrame("player", 0, 1, 1, 2, 700);

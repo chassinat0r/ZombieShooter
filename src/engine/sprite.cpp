@@ -223,8 +223,11 @@ void Sprite::draw(Camera camera) {
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
 
+    float rx = std::floor(x);
+    float ry = std::floor(y);
+
     TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
-    TextureManager::drawTex(x, y, scale, camera);
+    TextureManager::drawTex(rx, ry, scale, camera);
 }
 
 void Sprite::move(float dx, float dy) {
