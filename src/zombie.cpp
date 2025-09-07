@@ -113,6 +113,7 @@ void Zombie::getPathToTarget() {
         clone.setPos(cx, cy);
         clone.update();
 
+        printf("X: %.2f Y: %.2f\n", cx, cy);
         std::map<std::string,std::vector<Rect_F>> projectedHitboxes = clone.getHitboxes();
         std::vector<Rect_F> projectedHitboxesVec = getHitboxVector(projectedHitboxes);
 
@@ -190,7 +191,7 @@ void Zombie::getPathToTarget() {
 
                     std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
                     std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
-                    if (doObjectsCollide(projectedHitboxesVec, realTileHitboxes)) {
+                    if (doObjectsCollide(projectedHitboxesVec, realTileHitboxes) && !clone.isCollidingWith(*target)) {
                         collidingWithTile = true;
                     }
                 }

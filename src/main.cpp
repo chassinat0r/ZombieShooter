@@ -150,9 +150,9 @@ void update() {
     zombie->update();
     player->update();
 
-    if (zombie->targetMovedFromDestination()) {
-        zombie->getPathToTarget();
-    }
+    // if (zombie->targetMovedFromDestination()) {
+    //     zombie->getPathToTarget();
+    // }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -468,14 +468,11 @@ int main() {
     Global::debug = Global::level->addTile("debug", 0, 0, 1, 1, true);
 
     Global::level->addHitbox(stone, 0, 0, 16, 8);
-    Global::level->fillLayer(layer, stone, -4, 4, 4, 5);
-    Global::level->fillLayer(layer, stone, -4, 4, -3, -4);
-    Global::level->fillLayer(layer, stone, 4, 4, 3, -4);
-    Global::level->fillLayer(layer, stone, -1, -3, 0, -1);
-    Global::level->fillLayer(layer, stone, -1, 4, 0, 2);
-    Global::level->fillLayer(layer, stone, -4, -4, 4, -3);
 
-    Global::level->fillLayer(floor, carpet, -4, -3, 4, 4);
+    Global::level->fillLayer(layer, stone, -10, 10, 10, 9);
+    Global::level->fillLayer(layer, stone, -10, -9, 10, -10);
+    Global::level->fillLayer(layer, stone, -10, 10, -9, -10);
+    Global::level->fillLayer(floor, carpet, -10, -10, 10, 10);
 
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);
