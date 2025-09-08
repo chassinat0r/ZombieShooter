@@ -26,14 +26,20 @@ class Level {
         std::vector<Rect> getHitboxes(int t);
         std::pair<int,int> getTileSize(int l);
         
-        void render(Camera camera);
+        void render(Camera camera, bool debug = false);
+        void drawHitboxes(float scale, Camera camera, std::vector<Rect_F> realHitboxes);
 
+        inline static unsigned int VAO, VBO, EBO;
+
+        inline static Shader *hbShader;
+        
     private:
         std::vector<std::map<int,std::map<int, int>>> layers;
         std::map<int,std::vector<Rect>> hitboxes;
         std::vector<Tile> tiles;
 
         std::map<int,std::pair<int, int>> layerTileSizes;
+
 };
 
 #endif

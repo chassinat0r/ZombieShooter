@@ -1,4 +1,5 @@
 #include <engine/animation.h>
+#include <global.h>
 
 Animation::Animation(std::string name) {
     this->name = name;
@@ -109,3 +110,4 @@ std::map<std::string, std::vector<Rect>> Animation::getAllHitboxes(int frame) {
 
     return std::map<std::string, std::vector<Rect>>(); // If there are no hitboxes for that frame return an empty map
 }
+

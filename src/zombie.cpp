@@ -113,7 +113,6 @@ void Zombie::getPathToTarget() {
         clone.setPos(cx, cy);
         clone.update();
 
-        printf("X: %.2f Y: %.2f\n", cx, cy);
         std::map<std::string,std::vector<Rect_F>> projectedHitboxes = clone.getHitboxes();
         std::vector<Rect_F> projectedHitboxesVec = getHitboxVector(projectedHitboxes);
 
@@ -132,44 +131,10 @@ void Zombie::getPathToTarget() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            int left;
-            int right;
-            int bottom;
-            int top;
-
-            bool leftDefined = false;
-            bool rightDefined = false;
-            bool bottomDefined = false;
-            bool topDefined = false;
-
-            for (Rect_F projHb : projectedHitboxesVec) {
-                int tempLeft = std::round(projHb.x1 / tileWidth);
-                int tempRight = std::round(projHb.x2 / tileWidth);
-                int tempBottom = std::round(projHb.y1 / tileHeight);
-                int tempTop = std::round(projHb.y2 / tileHeight);
-
-                if (tempLeft < left || !leftDefined) {
-                    left = tempLeft;
-                    leftDefined = true;
-                }
-                if (tempRight > right || !rightDefined) {
-                    right = tempRight;
-                    rightDefined = true;
-                }
-                if (tempBottom < bottom || !bottomDefined) {
-                    bottom = tempBottom;
-                    bottomDefined = true;
-                }
-                if (tempTop > top || !topDefined) {
-                    top = tempTop;
-                    topDefined = true;
-                }
-            }
-
-            left--;
-            right++;
-            bottom--;
-            top++;
+            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
+            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
+            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
+            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
 
             for (int r = bottom; r <= top; r++) {
                 if (layer.count(r) == 0) {

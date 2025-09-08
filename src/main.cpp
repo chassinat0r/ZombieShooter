@@ -150,9 +150,9 @@ void update() {
     zombie->update();
     player->update();
 
-    // if (zombie->targetMovedFromDestination()) {
-    //     zombie->getPathToTarget();
-    // }
+    if (zombie->targetMovedFromDestination()) {
+        zombie->getPathToTarget();
+    }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -456,6 +456,11 @@ int main() {
     zombie->allowHitboxCollision("arm", "torso");
     zombie->allowHitboxCollision("torso", "arm");
 
+    glGenVertexArrays(1, &Level::VAO);
+    glGenBuffers(1, &Level::VBO);
+    glGenBuffers(1, &Level::EBO);
+    Level::hbShader = new Shader("shaders/hitboxes.vert", "shaders/hitboxes.frag");
+
     Global::level = new Level();
 
     int floor = Global::level->newLayer(16, 16);
@@ -472,7 +477,9 @@ int main() {
     Global::level->fillLayer(layer, stone, -10, 10, 10, 9);
     Global::level->fillLayer(layer, stone, -10, -9, 10, -10);
     Global::level->fillLayer(layer, stone, -10, 10, -9, -10);
-    Global::level->fillLayer(floor, carpet, -10, -10, 10, 10);
+    Global::level->fillLayer(layer, stone, 9, 10, 10, -10);
+
+    Global::level->fillLayer(floor, carpet, -10, -8, 10, 8);
 
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);

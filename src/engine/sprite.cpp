@@ -122,46 +122,10 @@ void Sprite::update() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            int left;
-            int right;
-            int bottom;
-            int top;
-
-            bool leftDefined = false;
-            bool rightDefined = false;
-            bool bottomDefined = false;
-            bool topDefined = false;
-
-            for (auto it : currentHitboxes) {
-                for (Rect_F hb : it.second) {
-                    int tempLeft = std::round(hb.x1 / tileWidth);
-                    int tempRight = std::round(hb.x2 / tileWidth);
-                    int tempBottom = std::round(hb.y1 / tileWidth);
-                    int tempTop = std::round(hb.y2 / tileWidth);
-
-                    if (tempLeft < left || !leftDefined) {
-                        left = tempLeft;
-                        leftDefined = true;
-                    }
-                    if (tempRight > right || !rightDefined) {
-                        right = tempRight;
-                        rightDefined = true;
-                    }
-                    if (tempBottom < bottom || !bottomDefined) {
-                        bottom = tempBottom;
-                        bottomDefined = true;
-                    }
-                    if (tempTop > top || !topDefined) {
-                        top = tempTop;
-                        topDefined = true;
-                    }
-                }
-            }
-
-            left--;
-            right++;
-            top++;
-            bottom--;
+            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
+            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
+            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
+            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
 
             for (int r = bottom; r <= top; r++) {
                 if (layer.count(r) == 0) {
@@ -174,6 +138,10 @@ void Sprite::update() {
                     if (row.count(c) == 0) {
                         continue;
                     }
+
+                    float rx = (c * tileWidth);
+                    float ry = (r * tileHeight);
+
                     int t = row[c];
                     Tile tile = Global::level->getTile(t);
 
@@ -181,9 +149,22 @@ void Sprite::update() {
                         continue;
                     }
 
+                    float texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
+                    float texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
+    
                     std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
-                    std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
                     
+                    std::vector<Rect_F> realTileHitboxes;
+                    for (Rect hb : tileHitboxes) {
+                        Rect_F realHb;
+                        realHb.x1 = (rx - 0.5f*(float)tileWidth) + hb.x1;
+                        realHb.x2 = (rx - 0.5f*(float)tileWidth) + hb.x2;
+                        realHb.y1 = (ry + 0.5f*(float)tileHeight) - hb.y2;
+                        realHb.y2 = (ry + 0.5f*(float)tileHeight) - hb.y1;
+                    
+                        realTileHitboxes.push_back(realHb);
+                    }
+
                     std::vector<Rect_F> currentHitboxesVector;
 
                     for (auto it : currentHitboxes) {
@@ -194,6 +175,7 @@ void Sprite::update() {
 
                     if (doObjectsCollide(currentHitboxesVector, realTileHitboxes)) {
                         collision = true;
+                        break;
                     }
                 }
 

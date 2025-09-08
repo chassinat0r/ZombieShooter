@@ -1,4 +1,5 @@
 #include <engine/level.h>
+#include <global.h>
 
 #include <algorithm>
 #include <stack>
@@ -68,7 +69,7 @@ void Level::fillLayer(int layer, int tile, int x1, int y1, int x2, int y2) {
 
 }
 
-void Level::render(Camera camera) {
+void Level::render(Camera camera, bool debug) {
     std::map<int, std::pair<int, int>> lastRow;
     
     int layerNo = 0;
@@ -97,6 +98,9 @@ void Level::render(Camera camera) {
                 int texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
                 int texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
 
+                float ox = x;
+                float oy = y;
+
                 if (texWidth > layerTileWidth) {
                     int diff = texWidth - layerTileWidth;
                     x -= 0.5f*(float)diff;
@@ -108,6 +112,22 @@ void Level::render(Camera camera) {
                 }
                 
                 TextureManager::drawTex(x, y, 1.0f, camera);
+                if (debug) {
+                    std::vector<Rect> hitboxesForTile = getHitboxes(t);
+                    std::vector<Rect_F> realHitboxes;
+                    for (Rect hb : hitboxesForTile) {
+                        Rect_F realHb;
+                        realHb.x1 = (ox - 0.5f*(float)layerTileWidth) + hb.x1;
+                        realHb.x2 = (ox - 0.5f*(float)layerTileWidth) + hb.x2;
+                        realHb.y1 = (oy + 0.5f*(float)layerTileHeight) - hb.y2;
+                        realHb.y2 = (oy + 0.5f*(float)layerTileHeight) - hb.y1;
+                    
+                        realHitboxes.push_back(realHb);
+                    }
+                    
+                    drawHitboxes(1.0f, camera, realHitboxes);
+
+                }
             }
 
             rows.pop();
@@ -135,4 +155,61 @@ std::vector<Rect> Level::getHitboxes(int t) {
 
 std::pair<int, int> Level::getTileSize(int l) {
     return layerTileSizes[l];
+}
+
+void Level::drawHitboxes(float scale, Camera camera, std::vector<Rect_F> realHitboxes) {
+    float vertices[12] = {
+        0.5f,  0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f,
+    };
+
+    unsigned int indices[6] = {
+        0, 1, 3,
+        1, 2, 3
+    };
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    hbShader->use();
+
+    float h = DEF_HEIGHT;
+    float w = ((float)DEF_HEIGHT / (float)Global::height) * Global::width; 
+    
+    float left = -w*0.5f;
+    float right = w*0.5f;
+    float bottom = -h*0.5f;
+    float top = h*0.5f;
+
+    glm::mat4 projection = glm::ortho(left, right, bottom, top, 0.0f, 100.0f);
+
+    for (Rect_F hb : realHitboxes) {
+        glm::mat4 view = glm::mat4(1.0f);
+        view  = glm::translate(view, glm::vec3(-camera.x, -camera.y, 0.0f));    
+        view = glm::scale(view, glm::vec3((float)scale, (float)scale, 1.0f));
+        float w = hb.x2 - hb.x1;
+        float h = hb.y2 - hb.y1;
+        view = glm::scale(view, glm::vec3(w, h, 1.0f));
+        glm::mat4 model = glm::mat4(1.0f);
+        float mx = (hb.x1 + hb.x2) / 2.0f;
+        float my = (hb.y1 + hb.y2) / 2.0f;
+        model = glm::translate(model, glm::vec3(mx, my, 0.0f));
+        hbShader->setMatrix("projection", projection);
+        hbShader->setMatrix("view", view);
+        hbShader->setMatrix("model", model);
+        glUniform3fv(glGetUniformLocation(hbShader->ID, "color"), 1, glm::value_ptr(glm::vec3(1.0f, 0.0f, 0.0f)));
+
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
+    }
 }

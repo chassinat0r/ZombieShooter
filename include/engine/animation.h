@@ -30,7 +30,7 @@ class Animation {
         void addHitbox(std::string hbName, int frame, int x1, int y1, int x2, int y2);
         std::vector<Rect> getHitboxes(std::string hbName, int frame);
         std::map<std::string, std::vector<Rect>> getAllHitboxes(int frame);
-        
+
         // Getter functions
         int getNumberOfFrames();
         Frame getFrame(int index);
