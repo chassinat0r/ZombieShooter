@@ -35,7 +35,7 @@ bool doHitboxesCollide(Rect_F hb1, Rect_F hb2) {
 	float h2y1 = std::min(hb2.y1, hb2.y2);
 	float h2y2 = std::max(hb2.y1, hb2.y2);
 
-	if (std::min(h1x2, h2x2) > std::max(h1x1, h2x1) && std::min(h1y2, h2y2) > std::max(h1y1, h2y1)) {
+	if (std::min(h1x2, h2x2) >= std::max(h1x1, h2x1) && std::min(h1y2, h2y2) >= std::max(h1y1, h2y1)) {
 		return true;
 	}
 	

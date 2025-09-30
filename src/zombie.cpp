@@ -85,7 +85,7 @@ void Zombie::getPathToTarget() {
         return;
     }
 
-    std::map<std::string,std::vector<Rect_F>> targetHitboxes = target->getHitboxes();
+    std::vector<Rect_F> targetHitboxes = target->getHitboxes();
     
     std::pair<float,float> start = { x, y }; // Get starting position of 
     std::queue<std::pair<float,float>> frontier;
@@ -113,10 +113,9 @@ void Zombie::getPathToTarget() {
         clone.setPos(cx, cy);
         clone.update();
 
-        std::map<std::string,std::vector<Rect_F>> projectedHitboxes = clone.getHitboxes();
-        std::vector<Rect_F> projectedHitboxesVec = getHitboxVector(projectedHitboxes);
+        std::vector<Rect_F> projectedHitboxes = clone.getHitboxes();
 
-        if (projectedHitboxesVec.size() == 0) { return; }
+        if (projectedHitboxes.size() == 0) { return; }
 
         bool collidingWithTile = false;
         
@@ -156,7 +155,7 @@ void Zombie::getPathToTarget() {
 
                     std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
                     std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
-                    if (doObjectsCollide(projectedHitboxesVec, realTileHitboxes) && !clone.isCollidingWith(*target)) {
+                    if (doObjectsCollide(projectedHitboxes, realTileHitboxes) && !clone.isCollidingWith(*target)) {
                         collidingWithTile = true;
                     }
                 }

@@ -17,11 +17,12 @@ class Sprite {
         void setAnimation(std::string name);
         void draw(Camera camera);
         void move(float dx, float dy);
+        void jump();
+
         virtual void update();
 
-        void addHitbox(std::string animationName, std::string hbName, int frame, int x1, int y1, int x2, int y2);
+        void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
         void addCollisionLayer(int layer);
-        void allowHitboxCollision(std::string myHitboxName, std::string otherHitboxName);
 
         bool doesCollideOnLayer(int layer);
         
@@ -34,10 +35,11 @@ class Sprite {
         int getID();
 
         bool isCollidingWith(Sprite sprite);
-        std::map<std::string,std::vector<Rect_F>> getHitboxes();
+        std::vector<Rect_F> getHitboxes();
 
         bool hasMoved();
-            
+        bool isGrounded();
+        
         inline static std::vector<Sprite*> sprites;
 
         bool solid;
@@ -48,8 +50,7 @@ class Sprite {
         float scale;
 
         std::map<std::string,Animation> animations;
-        std::map<std::string,std::vector<std::string>> hitboxLinks;
-        std::map<std::string,std::vector<Rect_F>> currentHitboxes;
+        std::vector<Rect_F> currentHitboxes;
         
         std::string currentAnimation;
         int currentFrame = 0;
@@ -65,6 +66,8 @@ class Sprite {
         float velocityY = 0.0f;
 
         std::vector<int> collisionLayers;
+
+        bool grounded = false;
 };
 
 #endif

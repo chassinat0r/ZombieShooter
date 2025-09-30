@@ -60,4 +60,23 @@ typedef struct {
     bool solid;
 } Tile;
 
+typedef struct {
+    float x;
+    float yStart;
+    float yEnd;
+} VLine;
+
+typedef struct {
+    float xStart;
+    float xEnd;
+    float y;
+} HLine;
+
+typedef struct {
+    HLine top;
+    HLine bottom;
+    VLine left;
+    VLine right;
+} Hitbox;
+
 #endif

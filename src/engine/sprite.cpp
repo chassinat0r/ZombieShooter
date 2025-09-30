@@ -42,7 +42,6 @@ void Sprite::update() {
     lastY = y;
 
     x += velocityX/FPS;
-    y += velocityY/FPS;
 
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
@@ -63,52 +62,30 @@ void Sprite::update() {
     
     currentHitboxes.clear();
 
-    std::map<std::string, std::vector<Rect>> hitboxesForFrame = animation.getAllHitboxes(currentFrame);
+    std::vector<Rect> hitboxesForFrame = animation.getHitboxes(currentFrame);
 
-    for (auto it : hitboxesForFrame) {
-        std::vector<Rect_F> hitboxesForName;
-        for (Rect hb : it.second) {
-            hitboxesForName.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
-        }
-        currentHitboxes[it.first] = hitboxesForName;
+    for (Rect hb : hitboxesForFrame) {
+        currentHitboxes.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
     }
 
     bool collision = false;
+    grounded = false;
 
     if (solid) {
         for (Sprite *s : sprites) {
             if (s->solid && s->getID() != id) {
-                std::map<std::string,std::vector<Rect_F>> otherHitboxes = s->getHitboxes();
-                for (auto it : currentHitboxes) {
-                    std::string myHbName = it.first;
-                    if (hitboxLinks.count(myHbName) == 0) {
-                        continue;
-                    }
+                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
+                for (Rect_F myHb: currentHitboxes) {
+                    for (Rect_F otherHb: otherHitboxes) {
+                        collision = doHitboxesCollide(myHb, otherHb);
 
-                    std::vector<std::string> myHbLinks = hitboxLinks[myHbName];
-
-                    for (Rect_F myHb: it.second) {
-                        for (auto it2 : otherHitboxes) {
-                            std::string otherHbName = it2.first;
-
-                            if (std::find(myHbLinks.begin(), myHbLinks.end(), otherHbName) == myHbLinks.end()) {
-                                continue;
-                            }
-
-                            for (Rect_F otherHb: it2.second) {
-                                collision = doHitboxesCollide(myHb, otherHb);
-
-                                if (collision) { break; }
-                            }
-
-                            if (collision) { break; }
-                        }
                         if (collision) { break; }
                     }
                     if (collision) { break; }
                 }
                 if (collision) { break; }
             }
+            if (collision) { break; }
         }
 
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
@@ -155,6 +132,7 @@ void Sprite::update() {
                     std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
                     
                     std::vector<Rect_F> realTileHitboxes;
+
                     for (Rect hb : tileHitboxes) {
                         Rect_F realHb;
                         realHb.x1 = (rx - 0.5f*(float)tileWidth) + hb.x1;
@@ -165,15 +143,7 @@ void Sprite::update() {
                         realTileHitboxes.push_back(realHb);
                     }
 
-                    std::vector<Rect_F> currentHitboxesVector;
-
-                    for (auto it : currentHitboxes) {
-                        for (Rect_F hb : it.second) {
-                            currentHitboxesVector.push_back(hb);
-                        }
-                    }
-
-                    if (doObjectsCollide(currentHitboxesVector, realTileHitboxes)) {
+                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
                         collision = true;
                         break;
                     }
@@ -190,15 +160,112 @@ void Sprite::update() {
 
         if (collision) {
             x = lastX;
+        }
+
+        y += velocityY/FPS;
+        currentHitboxes.clear();
+
+        for (Rect hb : hitboxesForFrame) {
+            currentHitboxes.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
+        }
+
+        collision = false;
+
+        for (Sprite *s : sprites) {
+            if (s->solid && s->getID() != id) {
+                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
+                for (Rect_F myHb: currentHitboxes) {
+                    for (Rect_F otherHb: otherHitboxes) {
+                        collision = doHitboxesCollide(myHb, otherHb);
+
+                        if (collision) { break; }
+                    }
+                    if (collision) { break; }
+                }
+                if (collision) { break; }
+            }
+            if (collision) { break; }
+        }
+
+        for (int l = 0; l < Global::level->getLayerCount(); l++) {
+            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
+                continue;
+            }
+
+            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
+            
+            std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
+            int tileWidth = tileDimensions.first;
+            int tileHeight = tileDimensions.second;
+
+            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
+            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
+            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
+            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
+
+            for (int r = bottom; r <= top; r++) {
+                if (layer.count(r) == 0) {
+                    continue;
+                }
+
+                std::map<int,int> row = layer[r];
+
+                for (int c = left; c <= right; c++) {
+                    if (row.count(c) == 0) {
+                        continue;
+                    }
+
+                    float rx = (c * tileWidth);
+                    float ry = (r * tileHeight);
+
+                    int t = row[c];
+                    Tile tile = Global::level->getTile(t);
+
+                    if (!tile.solid) {
+                        continue;
+                    }
+
+                    float texWidth = TextureManager::getTexWidth(tile.textureName, tile.c1, tile.c2);
+                    float texHeight = TextureManager::getTexHeight(tile.textureName, tile.r1, tile.r2);
+    
+                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
+                    
+                    std::vector<Rect_F> realTileHitboxes;
+
+                    for (Rect hb : tileHitboxes) {
+                        Rect_F realHb;
+                        realHb.x1 = (rx - 0.5f*(float)tileWidth) + hb.x1;
+                        realHb.x2 = (rx - 0.5f*(float)tileWidth) + hb.x2;
+                        realHb.y1 = (ry + 0.5f*(float)tileHeight) - hb.y2;
+                        realHb.y2 = (ry + 0.5f*(float)tileHeight) - hb.y1;
+                    
+                        realTileHitboxes.push_back(realHb);
+                    }
+
+                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
+                        collision = true;
+                        break;
+                    }
+                }
+
+                if (collision) {
+                    break;
+                }
+            }
+            if (collision) {
+                break;
+            }
+        }
+
+        if (collision) {
             y = lastY;
-            // printf("Collision\n");
-        } else {
-            // printf("No collision\n");
+            velocityY = 0;
+            grounded = true;
         }
     }
 
     velocityX = 0.0f;
-    velocityY = 0.0f;
+    velocityY -= 5.0f;
 }
 
 void Sprite::draw(Camera camera) {
@@ -221,7 +288,7 @@ float Sprite::getX() { return x; }
 
 float Sprite::getY() { return y; }
 
-void Sprite::addHitbox(std::string animationName, std::string hbName, int frame, int x1, int y1, int x2, int y2) {
+void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2) {
     std::map<int, std::vector<Rect>> framesForAnimation;
     std::vector<Rect> hitboxesForFrame;
 
@@ -231,34 +298,17 @@ void Sprite::addHitbox(std::string animationName, std::string hbName, int frame,
 
     Animation animation = animations[animationName];
 
-    animation.addHitbox(hbName, frame, x1, y1, x2, y2);
+    animation.addHitbox(frame, x1, y1, x2, y2);
 
     animations[animationName] = animation;
 }
 
 bool Sprite::isCollidingWith(Sprite sprite) {
-    std::map<std::string,std::vector<Rect_F>> otherHitboxes = sprite.getHitboxes();
-    for (auto it : currentHitboxes) {
-        std::string myHbName = it.first;
-        if (hitboxLinks.count(myHbName) == 0) {
-            continue;
-        }
-
-        std::vector<std::string> myHbLinks = hitboxLinks[myHbName];
-
-        for (Rect_F myHb: it.second) {
-            for (auto it2 : otherHitboxes) {
-                std::string otherHbName = it2.first;
-
-                for (Rect_F otherHb: it2.second) {
-                    if (std::find(myHbLinks.begin(), myHbLinks.end(), otherHbName) == myHbLinks.end()) {
-                        continue;
-                    }
-
-                    if (doHitboxesCollide(myHb, otherHb)) {
-                        return true;
-                    }
-                }
+    std::vector<Rect_F> otherHitboxes = sprite.getHitboxes();
+    for (Rect_F myHb : currentHitboxes) {
+        for (Rect_F otherHb: otherHitboxes) {
+            if (doHitboxesCollide(myHb, otherHb)) {
+                return true;
             }
         }
     }
@@ -266,7 +316,7 @@ bool Sprite::isCollidingWith(Sprite sprite) {
     return false;
 }
 
-std::map<std::string,std::vector<Rect_F>> Sprite::getHitboxes() {
+std::vector<Rect_F> Sprite::getHitboxes() {
     return currentHitboxes;
 }
 
@@ -288,15 +338,6 @@ bool Sprite::hasMoved() {
     return (lastX != x || lastY != y);
 }
 
-void Sprite::allowHitboxCollision(std::string myHitboxName, std::string otherHitboxName) {
-    std::vector<std::string> hitboxesForName;
-    if (hitboxLinks.count(myHitboxName) > 0) {
-        hitboxesForName = hitboxLinks[myHitboxName];
-    }
-    hitboxesForName.push_back(otherHitboxName);
-    hitboxLinks[myHitboxName] = hitboxesForName;
-}
-
 void Sprite::setPos(float x, float y) {
     this->x = x;
     this->y = y;
@@ -304,4 +345,12 @@ void Sprite::setPos(float x, float y) {
 
 void Sprite::setSolid(bool solid) {
     this->solid = solid;
+}
+
+void Sprite::jump() {
+    velocityY = 100;
+}
+
+bool Sprite::isGrounded() {
+    return grounded;
 }

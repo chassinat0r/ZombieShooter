@@ -50,27 +50,18 @@ Frame Animation::getFrame(int index) {
 Description: Add a hitbox for a frame to be checked for collision with other
 solid sprites.
 Parameters:
-- std::string hbName: Name of the hitbox type.
 - int frame: Index of the frame to apply it on.
 - int x1, y1, x2, y2: The start and end co-ordinates of the hitbox on the frame
 image.
 */
 
-void Animation::addHitbox(std::string hbName, int frame, int x1, int y1, int x2, int y2) {
-    std::map<std::string, std::vector<Rect>> frameHitboxes; // Create an empty map for hitboxes of the frame
+void Animation::addHitbox(int frame, int x1, int y1, int x2, int y2) {
+    std::vector<Rect> frameHitboxes; // Create an empty map for hitboxes of the frame
     if (hitboxes.count(frame) > 0) { // If previous hitboxes for that frame already exist
         frameHitboxes = hitboxes[frame]; // Import them all into the map so they aren't overwritten
     }
 
-    std::vector<Rect> nameHitboxes; // Create an empty vector of integer rectangles for storing local hitboxes with the name
-
-    if (frameHitboxes.count(hbName) > 0) { // If other hitboxes of that name exist for that frame
-        nameHitboxes = frameHitboxes.at(hbName); // Import them
-    }
-
-    nameHitboxes.push_back({x1, y1, x2, y2}); // Push the new hitbox to the vector
-
-    frameHitboxes[hbName] = nameHitboxes; // Store the vector in the frame hitboxes map for the hitbox name
+    frameHitboxes.push_back({x1, y1, x2, y2}); // Push the new hitbox to the vector
 
     hitboxes[frame] = frameHitboxes; // Write the new frame hitboxes map
 }
@@ -83,31 +74,11 @@ Parameters:
 Output: A vector of all hitboxes with the given name for the given frame.
 */
 
-std::vector<Rect> Animation::getHitboxes(std::string hbName, int frame) {
+std::vector<Rect> Animation::getHitboxes(int frame) {
     if (hitboxes.count(frame) > 0) { // If there exist hitboxes for the given frame
-        std::map<std::string, std::vector<Rect>> frameHitboxes = hitboxes.at(frame); // Get a map of all hitboxes by their name at the given frame
-
-        if (frameHitboxes.count(hbName) > 0) { // If there exist hitboxes with the given name at that frame
-            return frameHitboxes.at(hbName); // Return the vector of them
-        }
+        std::vector<Rect> frameHitboxes = hitboxes.at(frame); // Get a map of all hitboxes by their name at the given frame
+        return frameHitboxes;
     }
 
     return std::vector<Rect>(); // If there aren't hitboxes for the given frame or name, return empty vector
 }
-
-/* Animation::getAllHitboxes 
-Description: Get a map of all hitboxes by their name for a given frame.
-Parameters:
-- int frame: The frame index of the hitboxes.
-Output: A map of names and vectors of hitboxes for a given frame.
-*/
-
-std::map<std::string, std::vector<Rect>> Animation::getAllHitboxes(int frame) {
-    if (hitboxes.count(frame) > 0) {
-        std::map<std::string, std::vector<Rect>> frameHitboxes = hitboxes.at(frame);
-        return frameHitboxes;
-    }
-
-    return std::map<std::string, std::vector<Rect>>(); // If there are no hitboxes for that frame return an empty map
-}
-

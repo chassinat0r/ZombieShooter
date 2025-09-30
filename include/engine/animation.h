@@ -27,9 +27,8 @@ class Animation {
 
         // Adder functions
         void addFrame(std::string textureName, int r1, int c1, int r2, int c2, float duration);
-        void addHitbox(std::string hbName, int frame, int x1, int y1, int x2, int y2);
-        std::vector<Rect> getHitboxes(std::string hbName, int frame);
-        std::map<std::string, std::vector<Rect>> getAllHitboxes(int frame);
+        void addHitbox(int frame, int x1, int y1, int x2, int y2);
+        std::vector<Rect> getHitboxes(int frame);
 
         // Getter functions
         int getNumberOfFrames();
@@ -39,7 +38,7 @@ class Animation {
         std::string name; // Name of the animation
         std::vector<Frame> frames; // List of frames
 
-        std::map<int, std::map<std::string, std::vector<Rect>>> hitboxes; // Map of hitboxes for every frame and with their names
+        std::map<int, std::vector<Rect>> hitboxes; // Map of hitboxes for every frame
 };
 
 #endif
