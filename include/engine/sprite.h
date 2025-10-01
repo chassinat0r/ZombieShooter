@@ -17,10 +17,10 @@ class Sprite {
         void setAnimation(std::string name);
         void draw(Camera camera);
         void move(float dx, float dy);
-        void jump();
+        void jump(float jumpSpeed = 200.0f);
 
         virtual void update();
-
+        
         void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
         void addCollisionLayer(int layer);
 
@@ -28,7 +28,9 @@ class Sprite {
         
         float getX();
         float getY();
-
+        float getVelocityX();
+        float getVelocityY();
+        
         void setPos(float x, float y);
         void setSolid(bool solid);
         

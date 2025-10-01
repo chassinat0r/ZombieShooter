@@ -288,6 +288,9 @@ float Sprite::getX() { return x; }
 
 float Sprite::getY() { return y; }
 
+float Sprite::getVelocityX() { return velocityX; }
+float Sprite::getVelocityY() { return velocityY; }
+
 void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2) {
     std::map<int, std::vector<Rect>> framesForAnimation;
     std::vector<Rect> hitboxesForFrame;
@@ -347,8 +350,8 @@ void Sprite::setSolid(bool solid) {
     this->solid = solid;
 }
 
-void Sprite::jump() {
-    velocityY = 100;
+void Sprite::jump(float jumpSpeed) {
+    velocityY = jumpSpeed;
 }
 
 bool Sprite::isGrounded() {
