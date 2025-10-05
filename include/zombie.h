@@ -9,23 +9,17 @@
 
 class Zombie : public Sprite {
     public:
-        using Sprite::Sprite;
+        Zombie(float x, float y, int healthMax, int healthCurr, float scale = 1.0f, bool solid = true);
+        Zombie();
 
-        void update();
-        void setTarget(int id);
-        void getPathToTarget();
-
-        bool targetMovedFromDestination();
-
+        // void update();
+        
+        // void addHealth(int change = 1);
+        // void removeHealth(int change = 1);
+    
     private:
-        int targetId;
-
-        std::stack<Pos_F> path;
-
-        Sprite* getTarget();
-
-        Pos_F end;
-        bool endDefined = false;
+        int health;
+        int healthMax;
 };
 
 #endif

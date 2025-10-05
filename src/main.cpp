@@ -12,6 +12,7 @@
 #include <global.h>
 #include <constants.h>
 #include <player.h>
+#include <zombie.h>
 
 #include <iostream>
 #include <chrono>
@@ -29,6 +30,7 @@ int playerDir = 0;
 GLFWwindow* window;
 
 Player *player;
+Zombie *zombie;
 
 Camera camera = {0, 0, 0};
 
@@ -108,7 +110,7 @@ void handleInput() {
 
 void update() {
     player->update();
-
+    zombie->update();
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
@@ -167,12 +169,13 @@ int main() {
     TextureManager::loadTex("assets/brick.png", "brick", 1, 1);
     TextureManager::loadTex("assets/floor.png", "floor", 1, 1);
     TextureManager::loadTex("assets/debug.png", "debug", 1, 1);
-    TextureManager::loadTex("assets/zombie.png", "zombie", 1, 2);
+    TextureManager::loadTex("assets/zombie.png", "zombie", 2, 4);
     TextureManager::loadTex("assets/ui/health-bar.png", "health-bar", 1, 1);
     TextureManager::loadTex("assets/ui/health-icon.png", "health-icon", 1, 1);
     TextureManager::loadTex("assets/ui/health-states.png", "health-states", 1, 2);
 
     player = new Player(0, 55, 100, 100, 1.0f, true);
+    zombie = new Zombie(20, 55, 100, 100, 1.0f, true);
 
     glGenVertexArrays(1, &Level::VAO);
     glGenBuffers(1, &Level::VBO);
@@ -181,14 +184,15 @@ int main() {
 
     Global::level = new Level();
 
-    int layer = Global::level->newLayer(14, 14);
+    int layer = Global::level->newLayer(12, 12);
     player->addCollisionLayer(layer);
+    zombie->addCollisionLayer(layer);
 
     int carpet = Global::level->addTile("floor", 0, 0, 1, 1, false);
     int brick = Global::level->addTile("brick", 0, 0, 1, 1, true);
     Global::debug = Global::level->addTile("debug", 0, 0, 1, 1, true);
 
-    Global::level->addHitbox(brick, 0, 0, 14, 14);
+    Global::level->addHitbox(brick, 0, 0, 12, 12);
 
     Global::level->fillLayer(layer, brick, 0, 1, 3, 2);
     Global::level->fillLayer(layer, brick, 5, 3, 7, 4);

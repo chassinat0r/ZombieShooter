@@ -1,220 +1,49 @@
 #include <zombie.h>
-#include <vector>
-#include <algorithm>
 
-#include <global.h>
-#include <util.h>
+Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, scale, solid) {
+    this->health = healthCurr;
+    this->healthMax = healthMax;
 
-void Zombie::setTarget(int id) {
-    this->targetId = id;
+    Animation idleLeft("idle_left");
+    idleLeft.addFrame("zombie", 1, 0, 2, 1, 700);
+    idleLeft.addFrame("zombie", 1, 1, 2, 2, 700);
+    addAnimation("idle_left", idleLeft);
+
+    Animation idleRight("idle_right");
+    idleRight.addFrame("zombie", 0, 0, 1, 1, 700);
+    idleRight.addFrame("zombie", 0, 1, 1, 2, 700);
+    addAnimation("idle_right", idleRight);
+
+    // idle left
+    // frame 0
+    addHitbox("idle_left", 0, 4, 1, 12, 7);
+    addHitbox("idle_left", 0, 4, 7, 13, 9);
+    addHitbox("idle_left", 0, 7, 9, 13, 12);
+    addHitbox("idle_left", 0, 7, 12, 13, 15);
+
+    // frame 1
+    addHitbox("idle_left", 1, 4, 2, 12, 8);
+    addHitbox("idle_left", 1, 5, 9, 6, 9);
+    addHitbox("idle_left", 1, 7, 8, 13, 12);
+    addHitbox("idle_left", 1, 7, 12, 13, 15);
+
+    // idle right
+    // frame 0
+    addHitbox("idle_right", 0, 3, 1, 11, 7);
+    addHitbox("idle_right", 0, 2, 7, 11, 9);
+    addHitbox("idle_right", 0, 2, 9, 8, 11);
+    addHitbox("idle_right", 0, 2, 11, 8, 15);
+
+    // frame 1
+    addHitbox("idle_right", 1, 3, 2, 11, 8);
+    addHitbox("idle_right", 1, 9, 9, 10, 9);
+    addHitbox("idle_right", 1, 2, 8, 8, 11);
+    addHitbox("idle_right", 1, 2, 11, 8, 15);
+
+    // set starting animation
+    setAnimation("idle_left");
 }
 
-Sprite* Zombie::getTarget() {
-    Sprite *target;
-    for (Sprite *s : Sprite::sprites) {
-        if (s->getID() == targetId) {
-            target = s;
-            break;
-        }
-    }
+Zombie::Zombie() {
 
-    return target;
-}
-
-void Zombie::update() {
-    Sprite *target = getTarget();
-
-    bool findPath = false;
-    
-    Pos_F direction = {0.0f, 0.0f};
-    Pos_F nextStep;
-
-    if (!isCollidingWith(*target)) {
-        findPath = true;
-    
-        if (path.size() > 0) {
-            nextStep = path.top();
-            if (x < nextStep.x) {
-                direction.x = 1.0f;
-            } else if (x > nextStep.x) {
-                direction.x = -1.0f;
-            } else if (y < nextStep.y) {
-                direction.y = 1.0f;
-            } else if (y > nextStep.y) {
-                direction.y = -1.0f;
-            }
-
-            velocityX += direction.x*13.0f;
-            velocityY += direction.y*13.0f;
-        }
-    }
-
-    Sprite::update();
-
-    if (path.size() > 0 && findPath) {
-        if (direction.x == 1.0f && x >= nextStep.x) {
-            x = nextStep.x;
-            path.pop();
-        }
-        if (direction.x == -1.0f && x <= nextStep.x) {
-            x = nextStep.x;
-            path.pop();
-        }
-        if (direction.y == 1.0f && y >= nextStep.y) {
-            y = nextStep.y;
-            path.pop();
-        }
-        if (direction.y == -1.0f && y <= nextStep.y) {
-            y = nextStep.y;
-            path.pop();
-        }
-    }
-}
-
-void Zombie::getPathToTarget() {
-    while(!path.empty()) {
-        path.pop();
-    }
-    Sprite clone = *this;
-    clone.setSolid(false);
-    clone.setAnimation("zombie_front_still");
-
-    Sprite *target = getTarget();
-
-    if (isCollidingWith(*target)) {
-        return;
-    }
-
-    std::vector<Rect_F> targetHitboxes = target->getHitboxes();
-    
-    std::pair<float,float> start = { x, y }; // Get starting position of 
-    std::queue<std::pair<float,float>> frontier;
-    frontier.push(start);
-
-    std::map<std::pair<float,float>,std::pair<float,float>> cameFrom;
-    cameFrom.insert({{x, y}, {0, 0}});
-    
-    std::pair<float,float> current;
-    
-    bool found = false;
-    Animation animation = animations[currentAnimation];
-    Frame currentFrameObj = animation.getFrame(currentFrame);
-
-    float texWidth = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
-    float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
-
-    while (!frontier.empty()) {
-        current = frontier.front();
-        frontier.pop();
-            
-        float cx = current.first;
-        float cy = current.second;
-
-        clone.setPos(cx, cy);
-        clone.update();
-
-        std::vector<Rect_F> projectedHitboxes = clone.getHitboxes();
-
-        if (projectedHitboxes.size() == 0) { return; }
-
-        bool collidingWithTile = false;
-        
-        for (int l = 0; l < Global::level->getLayerCount(); l++) {
-            if (std::find(collisionLayers.begin(), collisionLayers.end(), l) == collisionLayers.end()) {
-                continue;
-            }
-
-            std::map<int, std::map<int,int>> layer = Global::level->getLayer(l);
-            
-            std::pair<int,int> tileDimensions = Global::level->getTileSize(l);
-            int tileWidth = tileDimensions.first;
-            int tileHeight = tileDimensions.second;
-
-            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
-            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
-            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
-            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
-
-            for (int r = bottom; r <= top; r++) {
-                if (layer.count(r) == 0) {
-                    continue;
-                }
-
-                std::map<int,int> row = layer[r];
-
-                for (int c = left; c <= right; c++) {
-                    if (row.count(c) == 0) {
-                        continue;
-                    }
-                    int t = row[c];
-                    Tile tile = Global::level->getTile(t);
-
-                    if (!tile.solid) {
-                        continue;
-                    }
-
-                    std::vector<Rect> tileHitboxes = Global::level->getHitboxes(t);
-                    std::vector<Rect_F> realTileHitboxes = getRealHitboxes(tileHitboxes, c*tileWidth, r*tileHeight, tileWidth, tileHeight, 1.0f);
-                    if (doObjectsCollide(projectedHitboxes, realTileHitboxes) && !clone.isCollidingWith(*target)) {
-                        collidingWithTile = true;
-                    }
-                }
-
-                if (collidingWithTile) {
-                    break;
-                }
-            }
-            if (collidingWithTile) {
-                break;
-            }
-        }
-
-        if (collidingWithTile) {
-            continue;
-        }
-
-        if (clone.isCollidingWith(*target)) {
-            found = true;
-            break;
-        }
-
-        // calculate graph neighbours
-        std::pair<float,float> potentialNeighbours[] = {{cx - 4.0f, cy}, {cx + 4.0f, cy}, {cx, cy - 4.0f}, {cx, cy + 4.0f}};
-
-        for (std::pair<float,float> neighbour : potentialNeighbours) {
-            if (cameFrom.find(neighbour) == cameFrom.end()) {
-                frontier.push(neighbour);
-
-                cameFrom.insert({neighbour, current});
-            }
-        }
-    }
-    if (found) {
-        end.x = current.first;
-        end.y = current.second;
-        endDefined = true;
-        while (true) {
-            current = cameFrom[current];
-            if (current == start || cameFrom[current] == current) { break; }
-    
-            path.push({current.first, current.second});
-        }
-    }
-}
-
-bool Zombie::targetMovedFromDestination() {
-    if (!endDefined) {
-        return true;
-    }
-
-    Sprite clone = *this;
-    clone.setSolid(false);
-    clone.setAnimation("zombie_front_still");
-
-    clone.setPos(end.x, end.y);
-    clone.update();
-
-    Sprite *target = getTarget();
-
-    return !clone.isCollidingWith(*target);
 }
