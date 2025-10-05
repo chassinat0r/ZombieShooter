@@ -12,7 +12,7 @@ class Sprite {
     public:
         Sprite();
         Sprite(float x, float y, float scale = 1.0f, bool solid = false, bool dud = false);
-
+        
         void addAnimation(std::string name, Animation animation);
         void setAnimation(std::string name);
         void draw(Camera camera);
