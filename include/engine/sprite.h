@@ -15,7 +15,7 @@ class Sprite {
         
         void addAnimation(std::string name, Animation animation);
         void setAnimation(std::string name);
-        void draw(Camera camera);
+        void draw(Camera *camera);
         void move(float dx, float dy);
         void jump(float jumpSpeed = 200.0f);
 

@@ -119,15 +119,17 @@ void draw() {
     glClearColor(0.55f, 0.01f, 0.55f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Global::level->render(camera);
+    Global::level->render(&camera);
 
     std::vector<Sprite*> sorted = Sprite::sprites;
 
     quickSort(&sorted, 0, sorted.size()-1);
     
     for (Sprite *s : sorted) {
-        s->draw(camera);
+        s->draw(&camera);
     }
+
+    player->drawHealthBar();
 
     glfwSwapBuffers(window);
 }
@@ -165,10 +167,12 @@ int main() {
     TextureManager::loadTex("assets/brick.png", "brick", 1, 1);
     TextureManager::loadTex("assets/floor.png", "floor", 1, 1);
     TextureManager::loadTex("assets/debug.png", "debug", 1, 1);
+    TextureManager::loadTex("assets/zombie.png", "zombie", 1, 2);
+    TextureManager::loadTex("assets/ui/health-bar.png", "health-bar", 1, 1);
+    TextureManager::loadTex("assets/ui/health-icon.png", "health-icon", 1, 1);
+    TextureManager::loadTex("assets/ui/health-states.png", "health-states", 1, 2);
 
-    TextureManager::loadTex("assets/zombie.png", "zombie", 4, 4);
-
-    player = new Player(0, 45, 100, 100, 1.0f, true);
+    player = new Player(0, 55, 100, 100, 1.0f, true);
 
     glGenVertexArrays(1, &Level::VAO);
     glGenBuffers(1, &Level::VBO);

@@ -1,6 +1,13 @@
+#include <engine/texturemgr.h>
+
 #include <player.h>
+#include <constants.h>
+#include <global.h>
 
 Player::Player(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, scale, solid) {
+    this->health = healthCurr;
+    this->healthMax = healthMax;
+    
     Animation playerIdleLeft("idle_left");
     playerIdleLeft.addFrame("player", 1, 0, 2, 1, 700);
     playerIdleLeft.addFrame("player", 1, 1, 2, 2, 700);
@@ -160,11 +167,37 @@ void Player::update() {
     }
 
     if (y < -280) {
-        x = 0;
-        y = 45;
+        y = -280;
+        removeHealth();
     }
 }
 
+void Player::drawHealthBar() {
+    float w = ((float)DEF_HEIGHT / (float)Global::height) * Global::width; 
+    float h = DEF_HEIGHT;
+
+    float hbStart = -0.5f*w + TextureManager::getTexWidth("health-icon", 0, 1);
+    TextureManager::setTex("health-bar", 0, 0, 1, 1, "left", "top");
+    TextureManager::drawTex(hbStart, 0.5f*h - 4, 1.5f);
+    
+    int availableSpaces = TextureManager::getTexWidth("health-bar", 0, 1) - 2;
+    int filledSpaces = ((float)health / (float)healthMax) * (float)availableSpaces;
+    
+    TextureManager::setTex("health-states", 0, 0, 1, 1, "left", "top");
+
+    for (int i = 0; i < filledSpaces; i++) {
+        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f);
+    }
+
+    TextureManager::setTex("health-states", 0, 1, 1, 2, "left", "top");
+
+    for (int i = filledSpaces; i < availableSpaces; i++) {
+        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f);
+    }
+
+    TextureManager::setTex("health-icon", 0, 0, 1, 1, "left", "top");
+    TextureManager::drawTex(-0.5f*w + 1, 0.5f*h - 1, 1.5f);
+}
 
 void Player::startMoving() {
     moving = true;
@@ -200,3 +233,27 @@ void Player::setDirection(int dir) {
 }
 
 int Player::getDirection() { return direction; }
+
+void Player::addHealth(int change) { 
+    health += change;
+    if (health > healthMax) {
+        health = healthMax;
+    }
+}
+
+
+void Player::removeHealth(int change) { 
+    health -= change;
+    if (health < 0) {
+        health = 0;
+        die();
+    }
+}
+
+void Player::die() {
+    x = 0;
+    y = 55;
+    velocityX = 0;
+    velocityY = 0;
+    health = healthMax;
+}

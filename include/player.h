@@ -9,6 +9,7 @@ class Player : public Sprite {
         Player();
 
         void update();
+        void drawHealthBar();
 
         void startMoving();
         void stopMoving();
@@ -19,15 +20,22 @@ class Player : public Sprite {
 
         void setDirection(int dir);
 
+        void addHealth(int change = 1);
+        void removeHealth(int change = 1);
+        void die();
+
     private:
         bool moving = false;
         bool running = false;
         bool falling = false;
         bool jumping = false;
 
-        int direction = 1; // 1 left, 2 right
+        int direction = 2; // 1 left, 2 right
         float jumpSpeed = 200.0f;
         float speed = 30.0f;
+
+        int health = 0;
+        int healthMax = 0;
 };
 
 #endif

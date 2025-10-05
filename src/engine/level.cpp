@@ -69,7 +69,7 @@ void Level::fillLayer(int layer, int tile, int x1, int y1, int x2, int y2) {
 
 }
 
-void Level::render(Camera camera, bool debug) {
+void Level::render(Camera *camera, bool debug) {
     std::map<int, std::pair<int, int>> lastRow;
     
     int layerNo = 0;
@@ -157,7 +157,7 @@ std::pair<int, int> Level::getTileSize(int l) {
     return layerTileSizes[l];
 }
 
-void Level::drawHitboxes(float scale, Camera camera, std::vector<Rect_F> realHitboxes) {
+void Level::drawHitboxes(float scale, Camera *camera, std::vector<Rect_F> realHitboxes) {
     float vertices[12] = {
         0.5f,  0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
@@ -195,7 +195,7 @@ void Level::drawHitboxes(float scale, Camera camera, std::vector<Rect_F> realHit
 
     for (Rect_F hb : realHitboxes) {
         glm::mat4 view = glm::mat4(1.0f);
-        view  = glm::translate(view, glm::vec3(-camera.x, -camera.y, 0.0f));    
+        view  = glm::translate(view, glm::vec3(-camera->x, -camera->y, 0.0f));    
         view = glm::scale(view, glm::vec3((float)scale, (float)scale, 1.0f));
         float w = hb.x2 - hb.x1;
         float h = hb.y2 - hb.y1;

@@ -268,10 +268,9 @@ void Sprite::update() {
     velocityY -= 5.0f;
 }
 
-void Sprite::draw(Camera camera) {
+void Sprite::draw(Camera *camera) {
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
-
     float rx = std::floor(x);
     float ry = std::floor(y);
 
