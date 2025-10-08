@@ -41,7 +41,7 @@ void Sprite::update() {
     lastX = x;
     lastY = y;
 
-    x += velocityX/FPS;
+    x += velocityX*((glfwGetTime()*1000 - Global::last_frame_time)/1000.0f);
 
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
@@ -168,7 +168,7 @@ void Sprite::update() {
             x = lastX;
         }
 
-        y += velocityY/FPS;
+        y += velocityY*((glfwGetTime()*1000 - Global::last_frame_time)/1000.0f);
         currentHitboxes.clear();
 
         for (Rect hb : hitboxesForFrame) {

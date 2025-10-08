@@ -1,4 +1,7 @@
 #include <zombie.h>
+#include <global.h>
+
+#include <GLFW/glfw3.h>
 
 Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, scale, solid) {
     this->health = healthCurr;
@@ -47,3 +50,22 @@ Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, boo
 Zombie::Zombie() {
 
 }
+
+void Zombie::update() {
+    Sprite::update();
+
+    if (timeOut) {
+        cdProgress += (glfwGetTime()*1000 - Global::last_frame_time);
+        if (cdProgress > cooldown) {
+            timeOut = false;
+            cdProgress = 0;
+        }
+    }
+}
+
+void Zombie::registerAttack() {
+    timeOut = true;
+    cdProgress = 0;
+}
+
+bool Zombie::isInCooldown() { return timeOut; }

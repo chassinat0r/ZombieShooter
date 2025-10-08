@@ -12,7 +12,11 @@ class Zombie : public Sprite {
         Zombie(float x, float y, int healthMax, int healthCurr, float scale = 1.0f, bool solid = true);
         Zombie();
 
-        // void update();
+        void registerAttack();
+
+        bool isInCooldown();
+
+        void update();
         
         // void addHealth(int change = 1);
         // void removeHealth(int change = 1);
@@ -20,6 +24,10 @@ class Zombie : public Sprite {
     private:
         int health;
         int healthMax;
+
+        bool timeOut = false;
+        float cooldown = 500;
+        float cdProgress = 0;
 };
 
 #endif
