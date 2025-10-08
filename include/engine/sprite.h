@@ -70,6 +70,8 @@ class Sprite {
         std::vector<int> collisionLayers;
 
         bool grounded = false;
+
+        std::vector<int> spriteCollisions;
 };
 
 #endif

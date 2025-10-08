@@ -70,22 +70,28 @@ void Sprite::update() {
 
     bool collision = false;
     grounded = false;
+    spriteCollisions.clear();
 
     if (solid) {
         for (Sprite *s : sprites) {
-            if (s->solid && s->getID() != id) {
+            int spriteId = s->getID();
+            if (s->solid && spriteId != id) {
                 std::vector<Rect_F> otherHitboxes = s->getHitboxes();
                 for (Rect_F myHb: currentHitboxes) {
                     for (Rect_F otherHb: otherHitboxes) {
                         collision = doHitboxesCollide(myHb, otherHb);
 
-                        if (collision) { break; }
+                        if (collision) {
+                            if (std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) == spriteCollisions.end()) {
+                                spriteCollisions.push_back(spriteId);
+                            }
+                            break;
+                        }
                     }
                     if (collision) { break; }
                 }
                 if (collision) { break; }
             }
-            if (collision) { break; }
         }
 
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
@@ -172,19 +178,24 @@ void Sprite::update() {
         collision = false;
 
         for (Sprite *s : sprites) {
-            if (s->solid && s->getID() != id) {
+            int spriteId = s->getID();
+            if (s->solid && spriteId != id) {
                 std::vector<Rect_F> otherHitboxes = s->getHitboxes();
                 for (Rect_F myHb: currentHitboxes) {
                     for (Rect_F otherHb: otherHitboxes) {
                         collision = doHitboxesCollide(myHb, otherHb);
 
-                        if (collision) { break; }
+                        if (collision) {
+                            if (std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) == spriteCollisions.end()) {
+                                spriteCollisions.push_back(spriteId);
+                            }
+                            break;
+                        }
                     }
                     if (collision) { break; }
                 }
                 if (collision) { break; }
             }
-            if (collision) { break; }
         }
 
         for (int l = 0; l < Global::level->getLayerCount(); l++) {
@@ -306,16 +317,8 @@ void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int
 }
 
 bool Sprite::isCollidingWith(Sprite sprite) {
-    std::vector<Rect_F> otherHitboxes = sprite.getHitboxes();
-    for (Rect_F myHb : currentHitboxes) {
-        for (Rect_F otherHb: otherHitboxes) {
-            if (doHitboxesCollide(myHb, otherHb)) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    int spriteId = sprite.getID();
+    return std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) != spriteCollisions.end();
 }
 
 std::vector<Rect_F> Sprite::getHitboxes() {

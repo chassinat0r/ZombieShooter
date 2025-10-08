@@ -111,6 +111,10 @@ void handleInput() {
 void update() {
     player->update();
     zombie->update();
+
+    if (player->isCollidingWith(*zombie)) {
+        player->removeHealth();
+    }
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
