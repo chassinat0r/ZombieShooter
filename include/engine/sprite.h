@@ -33,7 +33,7 @@ class Sprite {
         float getVelocityX();
         float getVelocityY();
         float getAngle();
-        
+
         void setPos(float x, float y);
         void setSolid(bool solid);
         
@@ -46,7 +46,7 @@ class Sprite {
         bool isGrounded();
         
         inline static std::vector<Sprite*> sprites;
-
+        inline static std::vector<std::pair<int, int>> spriteCollisions;
         bool solid;
 
     protected:
@@ -74,8 +74,6 @@ class Sprite {
         std::vector<int> collisionLayers;
 
         bool grounded = false;
-
-        std::vector<int> spriteCollisions;
 };
 
 #endif

@@ -71,7 +71,18 @@ void Sprite::update() {
 
     bool collision = false;
     grounded = false;
-    spriteCollisions.clear();
+
+    int i = 0;
+
+    while (i < spriteCollisions.size()) {
+        std::pair<int,int> sc = spriteCollisions[i];
+        if (sc.first == id) {
+            spriteCollisions.erase(spriteCollisions.begin()+i);
+            continue;
+        }
+
+        i++;
+    }
 
     if (solid) {
         for (Sprite *s : sprites) {
@@ -83,9 +94,7 @@ void Sprite::update() {
                         collision = doHitboxesCollide(myHb, otherHb);
 
                         if (collision) {
-                            if (std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) == spriteCollisions.end()) {
-                                spriteCollisions.push_back(spriteId);
-                            }
+                            spriteCollisions.push_back({id, spriteId});
                             break;
                         }
                     }
@@ -187,9 +196,7 @@ void Sprite::update() {
                         collision = doHitboxesCollide(myHb, otherHb);
 
                         if (collision) {
-                            if (std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) == spriteCollisions.end()) {
-                                spriteCollisions.push_back(spriteId);
-                            }
+                            spriteCollisions.push_back({id, spriteId});
                             break;
                         }
                     }
@@ -319,7 +326,12 @@ void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int
 
 bool Sprite::isCollidingWith(Sprite sprite) {
     int spriteId = sprite.getID();
-    return std::find(spriteCollisions.begin(), spriteCollisions.end(), spriteId) != spriteCollisions.end();
+    for (std::pair<int, int> sc : spriteCollisions) {
+        if ((sc.first == id && sc.second == spriteId) | (sc.first == spriteId && sc.second == id)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 std::vector<Rect_F> Sprite::getHitboxes() {
