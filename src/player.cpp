@@ -178,7 +178,7 @@ void Player::drawHealthBar() {
 
     float hbStart = -0.5f*w + TextureManager::getTexWidth("health-icon", 0, 1);
     TextureManager::setTex("health-bar", 0, 0, 1, 1, "left", "top");
-    TextureManager::drawTex(hbStart, 0.5f*h - 4, 1.5f);
+    TextureManager::drawTex(hbStart, 0.5f*h - 4, 1.5f, 0.0f);
     
     int availableSpaces = TextureManager::getTexWidth("health-bar", 0, 1) - 2;
     int filledSpaces = ((float)health / (float)healthMax) * (float)availableSpaces;
@@ -186,17 +186,17 @@ void Player::drawHealthBar() {
     TextureManager::setTex("health-states", 0, 0, 1, 1, "left", "top");
 
     for (int i = 0; i < filledSpaces; i++) {
-        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f);
+        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f, 0.0f);
     }
 
     TextureManager::setTex("health-states", 0, 1, 1, 2, "left", "top");
 
     for (int i = filledSpaces; i < availableSpaces; i++) {
-        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f);
+        TextureManager::drawTex(hbStart + ((i+1)*1.5f), 0.5f*h-4-1.5f, 1.5f, 0.0f);
     }
 
     TextureManager::setTex("health-icon", 0, 0, 1, 1, "left", "top");
-    TextureManager::drawTex(-0.5f*w + 1, 0.5f*h - 1, 1.5f);
+    TextureManager::drawTex(-0.5f*w + 1, 0.5f*h - 1, 1.5f, 0.0f);
 }
 
 void Player::startMoving() {

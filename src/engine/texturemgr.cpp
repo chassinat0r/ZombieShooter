@@ -140,7 +140,7 @@ float TextureManager::getTexHeight(std::string name, int r1,int r2) {
     return texHeight;
 }
 
-void TextureManager::drawTex(float x, float y, float scale, Camera *camera) {
+void TextureManager::drawTex(float x, float y, float scale, float angle, Camera *camera) {
     worldShader->use();
 
     float h = DEF_HEIGHT;
@@ -159,6 +159,7 @@ void TextureManager::drawTex(float x, float y, float scale, Camera *camera) {
     }
     view = glm::scale(view, glm::vec3((float)scale, (float)scale, 1.0f));
     view = glm::scale(view, glm::vec3((float)texWidth, (float)texHeight, 1.0f));
+    view = glm::rotate(view, 2.0f*(float)M_PI - angle, glm::vec3(0, 0, 1));
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(x, y, 0.0f));

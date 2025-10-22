@@ -18,6 +18,8 @@ class Sprite {
         void draw(Camera *camera);
         void move(float dx, float dy);
         void jump(float jumpSpeed = 200.0f);
+        void rotate(float diff);
+        void setAngle(float angle);
 
         virtual void update();
         
@@ -30,6 +32,7 @@ class Sprite {
         float getY();
         float getVelocityX();
         float getVelocityY();
+        float getAngle();
         
         void setPos(float x, float y);
         void setSolid(bool solid);
@@ -50,6 +53,7 @@ class Sprite {
         float x;
         float y;
         float scale;
+        float angle = 0.0f; // Angle in radians
 
         std::map<std::string,Animation> animations;
         std::vector<Rect_F> currentHitboxes;

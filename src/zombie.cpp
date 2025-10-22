@@ -61,6 +61,25 @@ void Zombie::update() {
             cdProgress = 0;
         }
     }
+
+    if (target != nullptr) {
+        if (target->getX() < x && direction == 2) {
+            setAnimation("idle_left");
+            direction = 1;
+        }
+        if (target->getX() > x && direction == 1) {
+            setAnimation("idle_right");
+            direction = 2;
+        }
+    }
+
+    if (!isCollidingWith(*target)) {
+        if (direction == 1) {
+            move(-speed, 0);
+        } else {
+            move(speed, 0);
+        }
+    }
 }
 
 void Zombie::registerAttack() {
@@ -69,3 +88,13 @@ void Zombie::registerAttack() {
 }
 
 bool Zombie::isInCooldown() { return timeOut; }
+
+void Zombie::setTarget(int targetId) {
+    std::vector<Sprite*> sprites = Sprite::sprites;
+    for (Sprite * s : sprites) {
+        if (s->getID() == targetId) {
+            target = s;
+            break;
+        }
+    }
+}

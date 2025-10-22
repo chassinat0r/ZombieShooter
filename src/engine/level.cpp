@@ -111,7 +111,7 @@ void Level::render(Camera *camera, bool debug) {
                     y -= 0.5f*(float)diff;
                 }
                 
-                TextureManager::drawTex(x, y, 1.0f, camera);
+                TextureManager::drawTex(x, y, 1.0f, 0.0f, camera);
                 if (debug) {
                     std::vector<Rect> hitboxesForTile = getHitboxes(t);
                     std::vector<Rect_F> realHitboxes;

@@ -6,6 +6,7 @@
 #include <util.h>
 
 #include <algorithm>
+#include <math.h>
 
 #include <GLFW/glfw3.h>
 
@@ -286,7 +287,7 @@ void Sprite::draw(Camera *camera) {
     float ry = std::floor(y);
 
     TextureManager::setTex(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.c1, currentFrameObj.r2, currentFrameObj.c2);
-    TextureManager::drawTex(rx, ry, scale, camera);
+    TextureManager::drawTex(rx, ry, scale, angle, camera);
 }
 
 void Sprite::move(float dx, float dy) {
@@ -359,3 +360,19 @@ void Sprite::jump(float jumpSpeed) {
 bool Sprite::isGrounded() {
     return grounded;
 }
+
+void Sprite::rotate(float diff) {
+    setAngle(angle + diff);
+}
+
+void Sprite::setAngle(float angle) {
+    this->angle = angle;
+    while (angle < 0) {
+        angle += 2*M_PI;
+    }
+    while (angle > 2*M_PI) {
+        angle -= 2*M_PI;
+    }
+}
+
+float Sprite::getAngle() { return angle; }

@@ -106,3 +106,4 @@ std::vector<Rect_F> getHitboxVector(std::map<std::string,std::vector<Rect_F>> hi
 	}
 	return hbVec;
 }
+

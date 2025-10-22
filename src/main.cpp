@@ -110,12 +110,12 @@ void handleInput() {
 
 void update() {
     player->update();
-    zombie->update();
+    // zombie->update();
 
-    if (player->isCollidingWith(*zombie) && !zombie->isInCooldown()) {
-        player->removeHealth();
-        zombie->registerAttack();
-    }
+    // if (player->isCollidingWith(*zombie) && !zombie->isInCooldown()) {
+    //     player->removeHealth();
+    //     zombie->registerAttack();
+    // }
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -182,7 +182,8 @@ int main() {
 
     player = new Player(0, 55, 100, 100, 1.0f, true);
     zombie = new Zombie(20, 55, 100, 100, 1.0f, true);
-
+    zombie->setTarget(player->getID());
+    
     glGenVertexArrays(1, &Level::VAO);
     glGenBuffers(1, &Level::VBO);
     glGenBuffers(1, &Level::EBO);
@@ -200,8 +201,7 @@ int main() {
 
     Global::level->addHitbox(brick, 0, 0, 12, 12);
 
-    Global::level->fillLayer(layer, brick, 0, 1, 3, 2);
-    Global::level->fillLayer(layer, brick, 5, 3, 7, 4);
+    Global::level->fillLayer(layer, brick, 0, 1, 10, 2);
 
     while (running) {
         double time_to_wait = FRAME_TARGET_TIME - (1000*glfwGetTime() - Global::last_frame_time);

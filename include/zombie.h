@@ -18,6 +18,7 @@ class Zombie : public Sprite {
 
         void update();
         
+        void setTarget(int targetId);
         // void addHealth(int change = 1);
         // void removeHealth(int change = 1);
     
@@ -28,6 +29,11 @@ class Zombie : public Sprite {
         bool timeOut = false;
         float cooldown = 500;
         float cdProgress = 0;
+
+        Sprite *target = nullptr;
+
+        int direction = 1; // 1 for left, 2 for right
+        float speed = 15.0f;
 };
 
 #endif
