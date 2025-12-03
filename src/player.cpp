@@ -4,7 +4,7 @@
 #include <constants.h>
 #include <global.h>
 
-Player::Player(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, scale, solid) {
+Player::Player(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "player", scale, solid) {
     this->health = healthCurr;
     this->healthMax = healthMax;
     
@@ -121,7 +121,6 @@ Player::Player() {
 }
 
 void Player::update() {
-
     if (moving) {
         if (direction == 1) {
             move(-speed, 0);

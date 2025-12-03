@@ -14,16 +14,18 @@ Sprite::Sprite() {
 
 }
 
-Sprite::Sprite(float x, float y, float scale, bool solid, bool dud) {
+Sprite::Sprite(float x, float y, std::string tag, float scale, bool solid, bool dud) {
     this->x = x;
     this->y = y;
     this->scale = scale;
     this->solid = solid;
+    this->tag = tag;
     if (!dud) {
         this->id = count;
         count++;
         sprites.push_back(this);
     }
+    angle = 0;
 }
 
 void Sprite::addAnimation(std::string name, Animation animation) {
@@ -33,6 +35,13 @@ void Sprite::addAnimation(std::string name, Animation animation) {
 void Sprite::setAnimation(std::string name) {
     currentAnimation = name;
     currentFrame = 0;
+    resetHitboxes();
+}
+
+void Sprite::resetHitboxes() {
+    hitboxes.clear();
+    Animation currAnimObject = animations.at(currentAnimation);
+    hitboxes = currAnimObject.getHitboxes(currentFrame);
 }
 
 void Sprite::update() {
@@ -41,6 +50,7 @@ void Sprite::update() {
 
     lastX = x;
     lastY = y;
+    lastPosSet = true;
 
     x += velocityX*((glfwGetTime()*1000 - Global::last_frame_time)/1000.0f);
 
@@ -49,25 +59,18 @@ void Sprite::update() {
     if (timer >= currentFrameObj.duration) {
         currentFrame++;
         timer = 0;
-    }
+        if (currentFrame == animation.getNumberOfFrames()) {
+            currentFrame = 0;
+        }
+        resetHitboxes();
 
-    if (currentFrame == animation.getNumberOfFrames()) {
-        currentFrame = 0;
     }
 
     currentFrameObj = animation.getFrame(currentFrame);
 
     std::map<int, std::vector<Rect>> framesOfAnimation; 
-    float texWidth = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
-    float texHeight = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
-    
-    currentHitboxes.clear();
-
-    std::vector<Rect> hitboxesForFrame = animation.getHitboxes(currentFrame);
-
-    for (Rect hb : hitboxesForFrame) {
-        currentHitboxes.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
-    }
+    width = TextureManager::getTexWidth(currentFrameObj.textureName, currentFrameObj.c1, currentFrameObj.c2);
+    height = TextureManager::getTexHeight(currentFrameObj.textureName, currentFrameObj.r1, currentFrameObj.r2);
 
     bool collision = false;
     grounded = false;
@@ -84,23 +87,30 @@ void Sprite::update() {
         i++;
     }
 
+    i = 0;
+
+    while (i < tagCollisions.size()) {
+        std::pair<int,std::string> sc = tagCollisions[i];
+        if (sc.first == id) {
+            tagCollisions.erase(tagCollisions.begin()+i);
+            continue;
+        }
+
+        i++;
+    }
+
+
     if (solid) {
         for (Sprite *s : sprites) {
             int spriteId = s->getID();
             if (s->solid && spriteId != id) {
-                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
-                for (Rect_F myHb: currentHitboxes) {
-                    for (Rect_F otherHb: otherHitboxes) {
-                        collision = doHitboxesCollide(myHb, otherHb);
+                if (doObjectsCollide(*this, *s)) {
+                    spriteCollisions.push_back({id, spriteId});
+                    tagCollisions.push_back({id, s->tag});
+                    tagCollisions.push_back({spriteId, tag});
 
-                        if (collision) {
-                            spriteCollisions.push_back({id, spriteId});
-                            break;
-                        }
-                    }
-                    if (collision) { break; }
+                    collision = true;
                 }
-                if (collision) { break; }
             }
         }
 
@@ -115,10 +125,10 @@ void Sprite::update() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
-            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
-            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
-            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
+            int left = std::floor((x - 0.5f*width) / (float)tileWidth);
+            int right = std::ceil((x + 0.5f*width) / (float)tileWidth);
+            int bottom = std::floor((y - 0.5f*height) / (float)tileHeight);
+            int top = std::ceil((y + 0.5f*height) / (float)tileHeight);
 
             for (int r = bottom; r <= top; r++) {
                 if (layer.count(r) == 0) {
@@ -149,28 +159,25 @@ void Sprite::update() {
                     
                     std::vector<Rect_F> realTileHitboxes;
 
-                    for (Rect hb : tileHitboxes) {
-                        Rect_F realHb;
-                        realHb.x1 = (rx - 0.5f*(float)tileWidth) + hb.x1;
-                        realHb.x2 = (rx - 0.5f*(float)tileWidth) + hb.x2;
-                        realHb.y1 = (ry + 0.5f*(float)tileHeight) - hb.y2;
-                        realHb.y2 = (ry + 0.5f*(float)tileHeight) - hb.y1;
-                    
-                        realTileHitboxes.push_back(realHb);
-                    }
+                    CollidableObject tileObj;
+                    tileObj.tag = tile.tag;
+                    tileObj.x = c*tileWidth;
+                    tileObj.y = r*tileHeight;
+                    tileObj.width = tileWidth;
+                    tileObj.height = tileHeight;
+                    tileObj.scale = 1.0f;
+                    tileObj.angle = 0.0f;
+                    tileObj.solid = true;
+                    tileObj.anchorX = "centre";
+                    tileObj.anchorY = "centre";
+                    tileObj.hitboxes = Global::level->getHitboxes(t);
 
-                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
+                    if (doObjectsCollide(*this, tileObj)) {
                         collision = true;
+                        tagCollisions.push_back({id, tileObj.tag});
                         break;
                     }
                 }
-
-                if (collision) {
-                    break;
-                }
-            }
-            if (collision) {
-                break;
             }
         }
 
@@ -181,28 +188,18 @@ void Sprite::update() {
         y += velocityY*((glfwGetTime()*1000 - Global::last_frame_time)/1000.0f);
         currentHitboxes.clear();
 
-        for (Rect hb : hitboxesForFrame) {
-            currentHitboxes.push_back(getRealHitbox(hb, x, y, texWidth, texHeight, scale));
-        }
-
         collision = false;
 
         for (Sprite *s : sprites) {
             int spriteId = s->getID();
             if (s->solid && spriteId != id) {
-                std::vector<Rect_F> otherHitboxes = s->getHitboxes();
-                for (Rect_F myHb: currentHitboxes) {
-                    for (Rect_F otherHb: otherHitboxes) {
-                        collision = doHitboxesCollide(myHb, otherHb);
+                if (doObjectsCollide(*this, *s)) {
+                    spriteCollisions.push_back({id, spriteId});
+                    tagCollisions.push_back({id, s->tag});
+                    tagCollisions.push_back({spriteId, tag});
 
-                        if (collision) {
-                            spriteCollisions.push_back({id, spriteId});
-                            break;
-                        }
-                    }
-                    if (collision) { break; }
+                    collision = true;
                 }
-                if (collision) { break; }
             }
         }
 
@@ -217,10 +214,10 @@ void Sprite::update() {
             int tileWidth = tileDimensions.first;
             int tileHeight = tileDimensions.second;
 
-            int left = std::floor((x - 0.5f*texWidth) / (float)tileWidth);
-            int right = std::ceil((x + 0.5f*texWidth) / (float)tileWidth);
-            int bottom = std::floor((y - 0.5f*texHeight) / (float)tileHeight);
-            int top = std::ceil((y + 0.5f*texHeight) / (float)tileHeight);
+            int left = std::floor((x - 0.5f*width) / (float)tileWidth);
+            int right = std::ceil((x + 0.5f*width) / (float)tileWidth);
+            int bottom = std::floor((y - 0.5f*height) / (float)tileHeight);
+            int top = std::ceil((y + 0.5f*height) / (float)tileHeight);
 
             for (int r = bottom; r <= top; r++) {
                 if (layer.count(r) == 0) {
@@ -251,28 +248,24 @@ void Sprite::update() {
                     
                     std::vector<Rect_F> realTileHitboxes;
 
-                    for (Rect hb : tileHitboxes) {
-                        Rect_F realHb;
-                        realHb.x1 = (rx - 0.5f*(float)tileWidth) + hb.x1;
-                        realHb.x2 = (rx - 0.5f*(float)tileWidth) + hb.x2;
-                        realHb.y1 = (ry + 0.5f*(float)tileHeight) - hb.y2;
-                        realHb.y2 = (ry + 0.5f*(float)tileHeight) - hb.y1;
-                    
-                        realTileHitboxes.push_back(realHb);
-                    }
+                    CollidableObject tileObj;
+                    tileObj.tag = tile.tag;
+                    tileObj.x = c*tileWidth;
+                    tileObj.y = r*tileHeight;
+                    tileObj.width = tileWidth;
+                    tileObj.height = tileHeight;
+                    tileObj.scale = 1.0f;
+                    tileObj.angle = 0.0f;
+                    tileObj.solid = true;
+                    tileObj.anchorX = "centre";
+                    tileObj.anchorY = "centre";
+                    tileObj.hitboxes = Global::level->getHitboxes(t);
 
-                    if (doObjectsCollide(currentHitboxes, realTileHitboxes)) {
+                    if (doObjectsCollide(*this, tileObj)) {
                         collision = true;
                         break;
                     }
                 }
-
-                if (collision) {
-                    break;
-                }
-            }
-            if (collision) {
-                break;
             }
         }
 
@@ -328,6 +321,15 @@ bool Sprite::isCollidingWith(Sprite sprite) {
     int spriteId = sprite.getID();
     for (std::pair<int, int> sc : spriteCollisions) {
         if ((sc.first == id && sc.second == spriteId) || (sc.first == spriteId && sc.second == id)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Sprite::isCollidingWithTag(std::string tag) {
+    for (std::pair<int, std::string> sc : tagCollisions) {
+        if (sc.first == id && sc.second.compare(tag) == 0) {
             return true;
         }
     }

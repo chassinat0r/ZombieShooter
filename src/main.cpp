@@ -112,7 +112,7 @@ void handleInput() {
 
 void update() {
     player->update();
-    // zombie->update();
+    zombie->update();
 
     if (player->isCollidingWith(*zombie) && !zombie->isInCooldown()) {
         player->removeHealth();
@@ -188,7 +188,7 @@ int main() {
     FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 48);
     
     player = new Player(0, 55, 100, 100, 1.0f, true);
-    zombie = new Zombie(20, 55, 100, 100, 1.0f, true);
+    zombie = new Zombie(80, 55, 100, 100, 1.0f, true);
     zombie->setTarget(player->getID());
     
     glGenVertexArrays(1, &Level::VAO);
@@ -202,18 +202,20 @@ int main() {
     player->addCollisionLayer(layer);
     zombie->addCollisionLayer(layer);
 
-    int carpet = Global::level->addTile("floor", 0, 0, 1, 1, false);
-    int grass = Global::level->addTile("terrain", 0, 0, 1, 1, true);
-    int dirt = Global::level->addTile("terrain", 0, 1, 1, 2, true);
-    int brick = Global::level->addTile("terrain", 0, 2, 1, 3, true);
+    int carpet = Global::level->addTile("floor", "carpet", 0, 0, 1, 1, false);
+    int grass = Global::level->addTile("terrain", "ground", 0, 0, 1, 1, true);
+    int dirt = Global::level->addTile("terrain", "ground", 0, 1, 1, 2, true);
+    int brick = Global::level->addTile("terrain", "ground", 0, 2, 1, 3, true);
 
-    Global::debug = Global::level->addTile("debug", 0, 0, 1, 1, true);
+    Global::debug = Global::level->addTile("debug", "debug", 0, 0, 1, 1, true);
 
     Global::level->addHitbox(brick, 0, 0, 12, 12);
     Global::level->addHitbox(grass, 0, 0, 12, 12);
     Global::level->addHitbox(dirt, 0, 0, 12, 12);
 
     Global::level->fillLayer(layer, grass, 0, 2, 15, 3);
+    Global::level->fillLayer(layer, brick, 3, 3, 6, 4);
+
     Global::level->fillLayer(layer, dirt, 0, 0, 15, 2);
     Global::level->fillLayer(layer, dirt, 15, 0, 18, 3);
     Global::level->fillLayer(layer, grass, 15, 3, 18, 4);

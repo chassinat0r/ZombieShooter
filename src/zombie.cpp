@@ -3,7 +3,7 @@
 
 #include <GLFW/glfw3.h>
 
-Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, scale, solid) {
+Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "zombie", scale, solid) {
     this->health = healthCurr;
     this->healthMax = healthMax;
 
@@ -54,6 +54,10 @@ Zombie::Zombie() {
 void Zombie::update() {
     Sprite::update();
 
+    if (isCollidingWithTag("ground") && isGrounded()) {
+        jump(100.0f);
+    }
+    
     if (timeOut) {
         cdProgress += (glfwGetTime()*1000 - Global::last_frame_time);
         if (cdProgress > cooldown) {
@@ -72,6 +76,7 @@ void Zombie::update() {
             direction = 2;
         }
     }
+
 
     if (!isCollidingWith(*target)) {
         if (direction == 1) {

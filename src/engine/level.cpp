@@ -8,9 +8,9 @@ Level::Level() {
 
 }
 
-int Level::addTile(std::string textureName, int r1, int c1, int r2, int c2, bool solid) {
+int Level::addTile(std::string textureName, std::string tag, int r1, int c1, int r2, int c2, bool solid) {
     int size = tiles.size();
-    Tile tile = { textureName, r1, c1, r2, c2, solid };
+    Tile tile = { textureName, tag, r1, c1, r2, c2, solid };
     tiles.push_back(tile);
     return size;
 }
@@ -212,4 +212,20 @@ void Level::drawHitboxes(float scale, Camera *camera, std::vector<Rect_F> realHi
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); 
     }
+}
+
+bool Level::doesTileExist(int l, int x, int y) {
+    if (layers.size() > l) {
+        return false;
+    }
+    
+    std::map<int, std::map<int,int>> layer = getLayer(l);
+
+    if (layer.find(y) == layer.end()) { return false; }
+
+    std::map<int, int> row = layer.at(y);
+
+    if (row.find(x) == row.end()) { return false; }
+
+    return true;
 }

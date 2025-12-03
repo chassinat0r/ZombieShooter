@@ -12,7 +12,7 @@ class Level {
     public:
         Level();
         
-        int addTile(std::string textureName, int r1 = 0, int c1 = 0, int r2 = 1, int c2 = 1, bool solid = false);
+        int addTile(std::string textureName, std::string tag, int r1 = 0, int c1 = 0, int r2 = 1, int c2 = 1, bool solid = false);
         void addHitbox(int tile, int x1, int y1, int x2, int y2);
 
         void setTile(int l, int tile, int x, int y);
@@ -21,7 +21,8 @@ class Level {
 
         int getLayerCount();
         std::map<int, std::map<int,int>> getLayer(int l);
-
+        bool doesTileExist(int l, int x, int y);
+        
         Tile getTile(int t);
         std::vector<Rect> getHitboxes(int t);
         std::pair<int,int> getTileSize(int l);

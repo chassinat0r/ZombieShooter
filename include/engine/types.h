@@ -2,6 +2,7 @@
 #define TYPES_H
 
 #include <string>
+#include <vector>
 
 typedef struct {
     int width;
@@ -53,6 +54,7 @@ typedef struct {
 
 typedef struct {
     std::string textureName;
+    std::string tag;
     int r1;
     int c1;
     int r2; 
@@ -78,5 +80,19 @@ typedef struct {
     VLine left;
     VLine right;
 } Hitbox;
+
+typedef struct {
+    std::string tag;
+    float x;
+    float y;
+    float width;
+    float height;
+    float scale;
+    float angle;
+    bool solid;
+    std::string anchorX;
+    std::string anchorY;
+    std::vector<Rect> hitboxes;
+} CollidableObject;
 
 #endif

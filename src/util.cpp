@@ -42,9 +42,12 @@ bool doHitboxesCollide(Rect_F hb1, Rect_F hb2) {
 	return false;
 }
 
-bool doObjectsCollide(std::vector<Rect_F> obj1, std::vector<Rect_F> obj2) {
-	for (Rect_F hb1 : obj1) {
-		for (Rect_F hb2 : obj2) {
+bool doObjectsCollide(CollidableObject obj1, CollidableObject obj2) {
+	std::vector<Rect_F> obj1Hitboxes = getRealHitboxes(obj1.hitboxes, obj1.x, obj1.y, obj1.width, obj1.height, obj1.scale, obj1.anchorX, obj1.anchorY);
+	std::vector<Rect_F> obj2Hitboxes = getRealHitboxes(obj2.hitboxes, obj2.x, obj2.y, obj2.width, obj2.height, obj2.scale, obj2.anchorX, obj2.anchorY);
+
+	for (Rect_F hb1 : obj1Hitboxes) {
+		for (Rect_F hb2 : obj2Hitboxes) {
 			if (doHitboxesCollide(hb1, hb2)) {
 				return true;
 			}
