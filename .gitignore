@@ -1,6 +1,2 @@
 main
 .vscode
-include/freetype
-src/engine/fontmgr.cpp
-include/engine/fontmgr.h
-include/engine/font.h

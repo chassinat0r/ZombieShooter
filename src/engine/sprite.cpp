@@ -327,7 +327,7 @@ void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int
 bool Sprite::isCollidingWith(Sprite sprite) {
     int spriteId = sprite.getID();
     for (std::pair<int, int> sc : spriteCollisions) {
-        if ((sc.first == id && sc.second == spriteId) | (sc.first == spriteId && sc.second == id)) {
+        if ((sc.first == id && sc.second == spriteId) || (sc.first == spriteId && sc.second == id)) {
             return true;
         }
     }
