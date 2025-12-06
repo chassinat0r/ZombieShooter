@@ -15,6 +15,7 @@
 #include <constants.h>
 #include <player.h>
 #include <zombie.h>
+#include <hotbar.h>
 
 #include <iostream>
 #include <chrono>
@@ -33,6 +34,7 @@ GLFWwindow* window;
 
 Player *player;
 Zombie *zombie;
+Hotbar *hotbar;
 
 Camera camera = {0, 0, 0};
 
@@ -108,6 +110,41 @@ void handleInput() {
             player->stopMoving();
         }
     }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_1)) {
+        hotbar->selectItem(0);
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_1)) {
+
+    }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_2)) {
+        hotbar->selectItem(1);
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_2)) {
+
+    }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_3)) {
+        hotbar->selectItem(2);
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_3)) {
+
+    }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_4)) {
+        hotbar->selectItem(3);
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_4)) {
+
+    }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_5)) {
+        hotbar->selectItem(4);
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_5)) {
+
+    }
 }
 
 void update() {
@@ -140,6 +177,8 @@ void draw() {
     }
 
     player->drawHealthBar();
+
+    hotbar->draw();
 
     // FontManager::drawText("Hello there!\nlol", "arial24", -Global::width*0.5f, 0.0f, glm::vec3(255.0f, 0.0f, 0.0f));
     glfwSwapBuffers(window);
@@ -183,6 +222,8 @@ int main() {
     TextureManager::loadTex("assets/ui/health-icon.png", "health-icon", 1, 1);
     TextureManager::loadTex("assets/ui/health-states.png", "health-states", 1, 2);
     TextureManager::loadTex("assets/terrain.png", "terrain", 1, 3);
+    TextureManager::loadTex("assets/ui/hotbar_slot.png", "hotbar_slot", 1, 1);
+    TextureManager::loadTex("assets/ui/hotbar_selected.png", "hotbar_selected", 1, 1);
 
     FontManager::init();
     FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 48);
@@ -191,6 +232,8 @@ int main() {
     zombie = new Zombie(80, 55, 100, 100, 1.0f, true);
     zombie->setTarget(player->getID());
     
+    hotbar = new Hotbar();
+
     glGenVertexArrays(1, &Level::VAO);
     glGenBuffers(1, &Level::VBO);
     glGenBuffers(1, &Level::EBO);
