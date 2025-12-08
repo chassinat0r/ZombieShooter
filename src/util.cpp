@@ -1,5 +1,7 @@
 #include <util.h>
 
+#include <global.h>
+
 void mergeArrays(const float *vertices, int vertices_length,  int vert_stride, const float *texture_coords, int tex_length, int tex_stride, float *final_arr, int final_length) {
 	int final_stride = vert_stride + tex_stride; 
 	int vertices_count = final_length / final_stride;
@@ -110,3 +112,9 @@ std::vector<Rect_F> getHitboxVector(std::map<std::string,std::vector<Rect_F>> hi
 	return hbVec;
 }
 
+std::pair<float, float> getRenderWidthAndHeight() {
+	float h = (Global::height < 700) ? DEF_HEIGHT : DEF_HEIGHT * (Global::height / 700.0f);
+    float w = (h / (float)Global::height) * Global::width; 
+    
+	return { w, h };
+}

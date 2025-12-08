@@ -3,6 +3,7 @@
 #include <engine/texturemgr.h>
 #include <global.h>
 #include <constants.h>
+#include <util.h>
 
 Hotbar::Hotbar() {
 
@@ -29,8 +30,9 @@ Inv_Item * Hotbar::selectItem(int index) {
 }
 
 void Hotbar::draw() {
-    float h = DEF_HEIGHT;
-    float w = ((float)DEF_HEIGHT / (float)Global::height) * Global::width; 
+    std::pair<float,float> wh = getRenderWidthAndHeight();
+    float w = wh.first;
+    float h = wh.second;
     
     const int texWidth = TextureManager::getTexWidth("hotbar_slot", 0, 1);
     const int texHeight = TextureManager::getTexHeight("hotbar_slot", 0, 1);

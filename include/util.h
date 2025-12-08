@@ -13,5 +13,6 @@ bool doObjectsCollide(CollidableObject obj1, CollidableObject obj2);
 Rect_F getRealHitbox(Rect objHitbox, float x, float y, int width, int height, float scale, std::string anchorX = "centre", std::string anchorY = "centre");
 std::vector<Rect_F> getRealHitboxes(std::vector<Rect> objHitboxes, float x, float y, int width, int height, float scale, std::string anchorX = "centre", std::string anchorY = "centre");
 std::vector<Rect_F> getHitboxVector(std::map<std::string,std::vector<Rect_F>> hitboxes);
+std::pair<float, float> getRenderWidthAndHeight();
 
 #endif

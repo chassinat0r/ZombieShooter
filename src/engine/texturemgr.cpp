@@ -143,9 +143,10 @@ float TextureManager::getTexHeight(std::string name, int r1,int r2) {
 void TextureManager::drawTex(float x, float y, float scale, float angle, Camera *camera) {
     worldShader->use();
 
-    float h = DEF_HEIGHT;
-    float w = ((float)DEF_HEIGHT / (float)Global::height) * Global::width; 
-    
+    std::pair<float,float> wh = getRenderWidthAndHeight();
+    float w = wh.first;
+    float h = wh.second;
+
     float left = -w*0.5f;
     float right = w*0.5f;
     float bottom = -h*0.5f;

@@ -3,6 +3,7 @@
 #include <player.h>
 #include <constants.h>
 #include <global.h>
+#include <util.h>
 
 Player::Player(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "player", scale, solid) {
     this->health = healthCurr;
@@ -172,8 +173,9 @@ void Player::update() {
 }
 
 void Player::drawHealthBar() {
-    float w = ((float)DEF_HEIGHT / (float)Global::height) * Global::width; 
-    float h = DEF_HEIGHT;
+    std::pair<float,float> wh = getRenderWidthAndHeight();
+    float w = wh.first;
+    float h = wh.second;
 
     float hbStart = -0.5f*w + TextureManager::getTexWidth("health-icon", 0, 1);
     TextureManager::setTex("health-bar", 0, 0, 1, 1, "left", "top");
