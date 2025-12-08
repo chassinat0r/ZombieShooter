@@ -185,6 +185,48 @@ void draw() {
 }
 
 int main() {
+    Inv_Item sword;
+    sword.itemId = 0;
+    sword.itemType = MELEE;
+    sword.timeout = 200;
+    sword.hasDurability = true;
+    sword.currentDurability = 70;
+    sword.maxDurability = 100;
+
+    Inv_Item pistol;
+    pistol.itemId = 1;
+    pistol.itemType = LD_RANGED;
+    pistol.timeout = 800;
+    pistol.doesReload = true;
+    pistol.reloadTime = 5000;
+    pistol.loadedAmmo = 5;
+    pistol.maxLoadedAmmo = 8;
+    pistol.totalAmmo = 60;
+
+    Inv_Item grenade;
+    grenade.itemId = 2;
+    grenade.itemType = HD_RANGED;
+    grenade.timeout = 20000;
+    grenade.hasDurability = true;
+    grenade.currentDurability = 4;
+    grenade.maxDurability = 5;
+    
+    Inv_Item bleeding;
+    bleeding.itemId = 3;
+    bleeding.itemType = CURSE;
+    bleeding.timeout = 15000;
+    bleeding.hasDurability = true;
+    bleeding.currentDurability = 4;
+    bleeding.maxDurability = 10;
+
+    Inv_Item speed;
+    speed.itemId = 4;
+    speed.itemType = POWERUP;
+    speed.timeout = 30000;
+    speed.hasDurability = true;
+    speed.currentDurability = 2;
+    speed.maxDurability = 6;
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -232,7 +274,8 @@ int main() {
     zombie = new Zombie(80, 55, 100, 100, 1.0f, true);
     zombie->setTarget(player->getID());
     
-    hotbar = new Hotbar();
+    Inv_Item hotbarItems[5] = {sword, pistol, grenade, bleeding, speed};
+    hotbar = new Hotbar(hotbarItems);
 
     glGenVertexArrays(1, &Level::VAO);
     glGenBuffers(1, &Level::VBO);
