@@ -91,7 +91,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
                 projectileAngle = atan2(scrMouseY, -scrMouseX);
 
             }
-            printf("Bullet angle is %.2f\n", toDegrees(projectileAngle));
+            // printf("Bullet angle is %.2f\n", toDegrees(projectileAngle));
             projectileAngle *= -1.0f;
 
         }

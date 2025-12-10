@@ -48,9 +48,14 @@ bool doObjectsCollide(CollidableObject obj1, CollidableObject obj2) {
 	std::vector<Rect_F> obj1Hitboxes = getRealHitboxes(obj1.hitboxes, obj1.x, obj1.y, obj1.width, obj1.height, obj1.scale, obj1.anchorX, obj1.anchorY);
 	std::vector<Rect_F> obj2Hitboxes = getRealHitboxes(obj2.hitboxes, obj2.x, obj2.y, obj2.width, obj2.height, obj2.scale, obj2.anchorX, obj2.anchorY);
 
-	for (Rect_F hb1 : obj1Hitboxes) {
-		for (Rect_F hb2 : obj2Hitboxes) {
-			if (doHitboxesCollide(hb1, hb2)) {
+	std::vector<Rect_F> obj1Lines = getCollisionLines(obj1Hitboxes);
+	std::vector<Rect_F> obj2Lines = getCollisionLines(obj2Hitboxes);
+
+	for (Rect_F l1 : obj1Lines) {
+		float l1arr[2][2] = {{l1.x1, l1.y1}, {l1.x2, l1.y2}};
+		for (Rect_F l2 : obj2Lines) {
+			float l2arr[2][2] = {{l2.x1, l2.y1}, {l2.x2, l2.y2}};
+			if (doLinesIntersect(l1arr, l2arr)) {
 				return true;
 			}
 		}
@@ -92,10 +97,29 @@ Rect_F getRealHitbox(Rect objHitbox, float x, float y, int width, int height, fl
 	return hitbox;
 }
 
+std::vector<Rect_F> getCollisionLines(std::vector<Rect_F> realHitboxes) {
+	std::vector<Rect_F> collisionLines;
+
+	for (Rect_F rhb : realHitboxes) {
+		Rect_F l1 = { rhb.x1, rhb.y1, rhb.x1, rhb.y2 };
+		Rect_F l2 = { rhb.x1, rhb.y1, rhb.x2, rhb.y1 };
+		Rect_F l3 = { rhb.x1, rhb.y2, rhb.x2, rhb.y2 };
+		Rect_F l4 = { rhb.x2, rhb.y1, rhb.x2, rhb.y2 };
+
+		collisionLines.push_back(l1);
+		collisionLines.push_back(l2);
+		collisionLines.push_back(l3);
+		collisionLines.push_back(l4);
+	}
+
+	return collisionLines;
+}
+
 std::vector<Rect_F> getRealHitboxes(std::vector<Rect> objHitboxes, float x, float y, int width, int height, float scale, std::string anchorX, std::string anchorY) {
 	std::vector<Rect_F> realHitboxes;
 
 	for (Rect hb : objHitboxes) {
+
 		realHitboxes.push_back(getRealHitbox(hb, x, y, width, height, scale, anchorX, anchorY));
 	}
 
@@ -159,5 +183,5 @@ bool doLinesIntersect(float l1[2][2], float l2[2][2]) {
 	
 	if (o4 == 0 && onSegment(l2[0], l1[1], l2[1])) { return true; }
 
-	return true;
+	return false;
 }

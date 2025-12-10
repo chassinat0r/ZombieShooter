@@ -17,5 +17,6 @@ std::pair<float, float> getRenderWidthAndHeight();
 double toDegrees(double radians);
 double toRadians(double degrees);
 bool doLinesIntersect(float l1[2][2], float l2[2][2]);
+std::vector<Rect_F> getCollisionLines(std::vector<Rect_F> realHitboxes);
 
 #endif
