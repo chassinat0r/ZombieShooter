@@ -140,7 +140,7 @@ float TextureManager::getTexHeight(std::string name, int r1,int r2) {
     return texHeight;
 }
 
-void TextureManager::drawTex(float x, float y, float scale, float angle, Camera *camera) {
+void TextureManager::drawTex(float x, float y, float scale, float angle, Camera *camera, glm::vec2 reflect) {
     worldShader->use();
 
     std::pair<float,float> wh = getRenderWidthAndHeight();
@@ -152,6 +152,18 @@ void TextureManager::drawTex(float x, float y, float scale, float angle, Camera 
     float bottom = -h*0.5f;
     float top = h*0.5f;
 
+    if (reflect.x == 1) {
+        float temp = left;
+        left = right;
+        right = temp;
+    }
+
+    if (reflect.y == 1) {
+        float temp = bottom;
+        bottom = top;
+        top = temp;
+    }
+    
     glm::mat4 projection = glm::ortho(left, right, bottom, top, 0.0f, 100.0f);
 
     glm::mat4 view = glm::mat4(1.0f);

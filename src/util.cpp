@@ -118,3 +118,46 @@ std::pair<float, float> getRenderWidthAndHeight() {
     
 	return { w, h };
 }
+
+double toDegrees(double radians) {
+	return radians * (180.0f/M_PI);
+}
+
+double toRadians(double degrees) {
+	return degrees * (M_PI/180.0f);
+}
+
+bool onSegment(float p[2], float q[2], float r[2]) {
+	return (q[0] <= std::max(p[0], r[0]) && 
+            q[0] >= std::min(p[0], r[0]) &&
+            q[1] <= std::max(p[1], r[1]) && 
+            q[1] >= std::min(p[1], r[1]));
+}
+
+int orientation(float p[2], float q[2], float r[2]) {
+	float val = (q[1] - p[1]) * (r[0] - q[0]) -
+				(q[0] - p[0]) * (r[1] - q[1]);
+	
+	if (val == 0) { return 0; }
+
+	return (val > 0) ? 1 : 2;
+}
+
+bool doLinesIntersect(float l1[2][2], float l2[2][2]) {
+	int o1 = orientation(l1[0], l1[1], l2[0]);
+	int o2 = orientation(l1[0], l1[1], l2[1]);
+	int o3 = orientation(l2[0], l2[1], l1[0]);
+	int o4 = orientation(l2[0], l2[1], l1[1]);
+
+	if (o1 != o2 && o3 != o4) { return true; }
+
+	if (o1 == 0 && onSegment(l1[0], l2[0], l1[1])) { return true; }
+
+	if (o2 == 0 && onSegment(l1[0], l2[1], l1[1])) { return true; }
+
+	if (o3 == 0 && onSegment(l2[0], l1[0], l2[1])) { return true; }
+	
+	if (o4 == 0 && onSegment(l2[0], l1[1], l2[1])) { return true; }
+
+	return true;
+}

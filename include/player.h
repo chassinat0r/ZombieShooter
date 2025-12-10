@@ -2,10 +2,11 @@
 #define PLAYER_H
 
 #include <engine/sprite.h>
+#include <character.h>
 
-class Player : public Sprite {
+class Player : public Character {
     public:
-        Player(float x, float y, int healthMax, int healthCurr, float scale = 1.0f, bool solid = false);
+        Player(float x, float y, float scale = 1.0f, bool solid = false);
         Player();
 
         void update();
@@ -20,8 +21,6 @@ class Player : public Sprite {
 
         void setDirection(int dir);
 
-        void addHealth(int change = 1);
-        void removeHealth(int change = 1);
         void die();
 
     private:
@@ -33,9 +32,6 @@ class Player : public Sprite {
         int direction = 2; // 1 left, 2 right
         float jumpSpeed = 200.0f;
         float speed = 30.0f;
-
-        int health = 0;
-        int healthMax = 0;
 };
 
 #endif

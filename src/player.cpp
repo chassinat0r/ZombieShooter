@@ -5,10 +5,7 @@
 #include <global.h>
 #include <util.h>
 
-Player::Player(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "player", scale, solid) {
-    this->health = healthCurr;
-    this->healthMax = healthMax;
-    
+Player::Player(float x, float y, float scale, bool solid) : Character(x, y, "player", scale, solid) {
     Animation playerIdleLeft("idle_left");
     playerIdleLeft.addFrame("player", 1, 0, 2, 1, 700);
     playerIdleLeft.addFrame("player", 1, 1, 2, 2, 700);
@@ -170,6 +167,10 @@ void Player::update() {
         y = -280;
         removeHealth();
     }
+
+    if (health == 0) {
+        die();
+    }
 }
 
 void Player::drawHealthBar() {
@@ -234,22 +235,6 @@ void Player::setDirection(int dir) {
 }
 
 int Player::getDirection() { return direction; }
-
-void Player::addHealth(int change) { 
-    health += change;
-    if (health > healthMax) {
-        health = healthMax;
-    }
-}
-
-
-void Player::removeHealth(int change) { 
-    health -= change;
-    if (health < 0) {
-        health = 0;
-        die();
-    }
-}
 
 void Player::die() {
     x = 0;

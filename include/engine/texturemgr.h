@@ -39,7 +39,7 @@ class TextureManager {
         static void init();
         static void loadTex(std::string filename, std::string name, int rows = 1, int cols = 1);
         static void setTex(std::string name, int r1 = 0, int c1 = 0, int r2 = 1, int c2 = 1, std::string anchorX = "centre", std::string anchorY = "centre");
-        static void drawTex(float x, float y, float scale, float angle, Camera *camera = nullptr);
+        static void drawTex(float x, float y, float scale, float angle, Camera *camera = nullptr, glm::vec2 reflect = glm::vec2(0, 0));
 
         static float getTexWidth(std::string name, int c1, int c2);
         static float getTexHeight(std::string name, int r1,int r2);

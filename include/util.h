@@ -14,5 +14,8 @@ Rect_F getRealHitbox(Rect objHitbox, float x, float y, int width, int height, fl
 std::vector<Rect_F> getRealHitboxes(std::vector<Rect> objHitboxes, float x, float y, int width, int height, float scale, std::string anchorX = "centre", std::string anchorY = "centre");
 std::vector<Rect_F> getHitboxVector(std::map<std::string,std::vector<Rect_F>> hitboxes);
 std::pair<float, float> getRenderWidthAndHeight();
+double toDegrees(double radians);
+double toRadians(double degrees);
+bool doLinesIntersect(float l1[2][2], float l2[2][2]);
 
 #endif
