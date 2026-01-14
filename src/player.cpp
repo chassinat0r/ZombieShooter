@@ -247,7 +247,7 @@ void Player::die() {
 }
 
 void Player::onZombieHit(Zombie *zombie) {
-    printf("ouch, a zombie hit me!\n");
+    // printf("ouch, a zombie hit me!\n");
     removeHealth();
     zombie->registerAttack();
 }

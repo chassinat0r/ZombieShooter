@@ -4,7 +4,7 @@
 #include <engine/sprite.h>
 #include <character.h>
 
-#include <events.h>
+#include <events/ZombieHitEvent.h>
 
 class Player : public Character, public ZombieHitListener {
     public:

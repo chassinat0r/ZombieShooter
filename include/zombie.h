@@ -4,10 +4,15 @@
 #include <engine/sprite.h>
 #include <engine/types.h>
 
+#include <events/BulletHitEvent.h>
+
+#include <bullet.h>
+#include <character.h>
+
 #include <stack>
 #include <queue>
 
-class Zombie : public Sprite {
+class Zombie : public Character, public BulletHitListener {
     public:
         Zombie(float x, float y, int healthMax, int healthCurr, float scale = 1.0f, bool solid = true);
         Zombie();
@@ -19,13 +24,10 @@ class Zombie : public Sprite {
         void update();
         
         void setTarget(int targetId);
-        // void addHealth(int change = 1);
-        // void removeHealth(int change = 1);
     
-    private:
-        int health;
-        int healthMax;
+        void onBulletHit();
 
+    private:
         bool timeOut = false;
         float cooldown = 500;
         float cdProgress = 0;

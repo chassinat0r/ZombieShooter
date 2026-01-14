@@ -1,8 +1,7 @@
-#ifndef EVENTS_H
-#define EVENTS_H
+#ifndef EVENT_ZOMBIEHIT
+#define EVENT_ZOMBIEHIT
 
 #include <zombie.h>
-
 #include <vector>
 
 class ZombieHitListener {

@@ -1,4 +1,4 @@
-#include <events.h>
+#include <events/ZombieHitEvent.h>
 
 ZombieHitEvent::ZombieHitEvent(Zombie *zombie) {
     for (ZombieHitListener *listener : listeners) {
@@ -9,4 +9,3 @@ ZombieHitEvent::ZombieHitEvent(Zombie *zombie) {
 void ZombieHitEvent::addListener(ZombieHitListener *listener) {
     listeners.push_back(listener);
 }
-

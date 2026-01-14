@@ -18,6 +18,7 @@
 #include <zombie.h>
 #include <hotbar.h>
 #include <util.h>
+#include <bullet.h>
 
 #include <iostream>
 #include <chrono>
@@ -43,6 +44,7 @@ Camera camera = {0, 0, 0};
 glm::vec2 mousePos = glm::vec2(0, 0);
 
 float projectileAngle = 0.0f;
+float realAngle = 0.0f;
 
 void quickSort(std::vector<Sprite*> *vec, int start, int end) {
     if (end <= start) { return; }
@@ -86,14 +88,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
         
         if ((player->getDirection() == 1 && scrMouseX <= 0)
         || (player->getDirection() == 2 && scrMouseX >= 0)) {
-            projectileAngle = atan2(scrMouseY, scrMouseX);
-            if (player->getDirection() == 1) {
-                projectileAngle = atan2(scrMouseY, -scrMouseX);
-
-            }
-            // printf("Bullet angle is %.2f\n", toDegrees(projectileAngle));
-            projectileAngle *= -1.0f;
-
+            projectileAngle = atan2(-scrMouseY, (player->getDirection() == 1) ? -scrMouseX : scrMouseX);
+            realAngle = atan2(-scrMouseY, scrMouseX);
         }
 
     }
@@ -123,8 +119,8 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
                     }
                 } else {
                     printf("shoot gun\n");
-                    float realAngle = (playerDir == 1) ? -projectileAngle : projectileAngle;
-                    // new Bullet(player->getX()+8.0f, player->getY()+1.0f, 1.0f, realAngle);
+                    float startX = (player->getDirection() == 1) ? player->getX() - 10.0f : player->getX() + 10.0f;
+                    new Bullet(startX, player->getY(), realAngle, 1.0f);
                     selectedItem->loadedAmmo--;
                     selectedItem->isInTimeout = true;
                     selectedItem->timeout = 0;
@@ -201,6 +197,10 @@ void update() {
     zombie->update();
     hotbar->update();
 
+    for (Bullet *bullet : Bullet::bullets) {
+        bullet->update();
+    }
+
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
 
@@ -231,6 +231,10 @@ void draw() {
 
     if (player->getDirection() == 1) {
         reflection.x = 1;
+    }
+
+    for (Bullet *bullet : Bullet::bullets) {
+        bullet->draw(&camera);
     }
 
     if (selectedItem != nullptr) {
@@ -324,9 +328,12 @@ int main() {
     FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 24);
     
     player = new Player(0, 55, 1.0f, true);
-    player->setMaxHealth(50);
-    player->setHealth(50);
+    player->setMaxHealth(25);
+    player->setHealth(25);
+
     zombie = new Zombie(80, 55, 100, 100, 1.0f, true);
+    zombie->setMaxHealth(10);
+    zombie->setHealth(10);
     zombie->setTarget(player->getID());
     
     Inv_Item hotbarItems[2] = {knife, pistol};
