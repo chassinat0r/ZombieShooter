@@ -11,7 +11,7 @@
 class Sprite : public CollidableObject {
     public:
         Sprite();
-        Sprite(float x, float y, std::string tag, float scale = 1.0f, bool solid = false, bool dud = false);
+        Sprite(float x, float y, std::string tag, float scale = 1.0f, bool solid = false, bool gravity = false, bool dud = false);
         
         void addAnimation(std::string name, Animation animation);
         void setAnimation(std::string name);
@@ -41,7 +41,7 @@ class Sprite : public CollidableObject {
         
         int getID();
 
-        bool isCollidingWith(Sprite sprite);
+        bool isCollidingWith(Sprite *sprite);
         bool isCollidingWithTag(std::string tag);
         std::vector<Rect_F> getHitboxes();
 
@@ -49,13 +49,13 @@ class Sprite : public CollidableObject {
         bool isGrounded();
         
         inline static std::vector<Sprite*> sprites;
-        inline static std::vector<std::pair<int, int>> spriteCollisions;
-        inline static std::vector<std::pair<int,std::string>> tagCollisions;
+
+        void addTagCollision(std::string tag);
 
     protected:
         std::map<std::string,Animation> animations;
         std::vector<Rect_F> currentHitboxes;
-        
+
         std::string currentAnimation;
         int currentFrame = 0;
         double timer = 0;
@@ -73,6 +73,10 @@ class Sprite : public CollidableObject {
         std::vector<int> collisionLayers;
 
         bool grounded = false;
+        bool gravity = false;
+
+        std::vector<Sprite*> spriteCollisions;
+        std::vector<std::string> tagCollisions;
 };
 
 #endif

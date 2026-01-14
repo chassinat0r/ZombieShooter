@@ -14,12 +14,13 @@ Sprite::Sprite() {
 
 }
 
-Sprite::Sprite(float x, float y, std::string tag, float scale, bool solid, bool dud) {
+Sprite::Sprite(float x, float y, std::string tag, float scale, bool solid, bool gravity, bool dud) {
     this->x = x;
     this->y = y;
     this->scale = scale;
     this->solid = solid;
     this->tag = tag;
+    this->gravity = gravity;
     if (!dud) {
         this->id = count;
         count++;
@@ -52,8 +53,6 @@ void Sprite::update() {
     lastY = y;
     lastPosSet = true;
 
-    x += velocityX*((glfwGetTime()*1000 - Global::last_frame_time)/1000.0f);
-
     Animation animation = animations[currentAnimation];
     Frame currentFrameObj = animation.getFrame(currentFrame);
     if (timer >= currentFrameObj.duration) {
@@ -75,41 +74,27 @@ void Sprite::update() {
     bool collision = false;
     grounded = false;
 
-    int i = 0;
 
-    while (i < spriteCollisions.size()) {
-        std::pair<int,int> sc = spriteCollisions[i];
-        if (sc.first == id) {
-            spriteCollisions.erase(spriteCollisions.begin()+i);
-            continue;
-        }
-
-        i++;
+    while (spriteCollisions.size() > 0) {
+        spriteCollisions.erase(spriteCollisions.begin());
     }
 
-    i = 0;
-
-    while (i < tagCollisions.size()) {
-        std::pair<int,std::string> sc = tagCollisions[i];
-        if (sc.first == id) {
-            tagCollisions.erase(tagCollisions.begin()+i);
-            continue;
-        }
-
-        i++;
+    while (tagCollisions.size() > 0) {
+        tagCollisions.erase(tagCollisions.begin());
     }
 
+    x += velocityX*((glfwGetTime()*1000.0f - Global::last_frame_time)/1000.0f);
 
     if (solid) {
         for (Sprite *s : sprites) {
             int spriteId = s->getID();
             if (s->solid && spriteId != id) {
                 if (doObjectsCollide(*this, *s)) {
-                    spriteCollisions.push_back({id, spriteId});
-                    tagCollisions.push_back({id, s->tag});
-                    tagCollisions.push_back({spriteId, tag});
-
+                    spriteCollisions.push_back(s);
+                    tagCollisions.push_back(s->tag);
+                    s->addTagCollision(tag);
                     collision = true;
+                    // printf("%s colliding with %s\n", tag.c_str(), s->tag.c_str());
                 }
             }
         }
@@ -174,11 +159,15 @@ void Sprite::update() {
 
                     if (doObjectsCollide(*this, tileObj)) {
                         collision = true;
-                        tagCollisions.push_back({id, tileObj.tag});
-                        break;
+                        if (tile.tag.size() > 0) {
+                            tagCollisions.push_back(tile.tag);
+                            break;
+                        } 
                     }
                 }
+                if (collision) { break; }
             }
+            if (collision) { break; }
         }
 
         if (collision) {
@@ -192,11 +181,11 @@ void Sprite::update() {
 
         for (Sprite *s : sprites) {
             int spriteId = s->getID();
-            if (s->solid && spriteId != id) {
+            if (s->solid && this != s) {
                 if (doObjectsCollide(*this, *s)) {
-                    spriteCollisions.push_back({id, spriteId});
-                    tagCollisions.push_back({id, s->tag});
-                    tagCollisions.push_back({spriteId, tag});
+                    spriteCollisions.push_back(s);
+                    tagCollisions.push_back(s->tag);
+                    s->addTagCollision(tag);
 
                     collision = true;
                 }
@@ -266,7 +255,9 @@ void Sprite::update() {
                         break;
                     }
                 }
+                if (collision) { break; }
             }
+            if (collision) { break; }
         }
 
         if (collision) {
@@ -277,7 +268,9 @@ void Sprite::update() {
     }
 
     velocityX = 0.0f;
-    velocityY -= 5.0f;
+    if (gravity) {
+        velocityY -= 5.0f;
+    }
 }
 
 void Sprite::draw(Camera *camera) {
@@ -317,22 +310,18 @@ void Sprite::addHitbox(std::string animationName, int frame, int x1, int y1, int
     animations[animationName] = animation;
 }
 
-bool Sprite::isCollidingWith(Sprite sprite) {
-    int spriteId = sprite.getID();
-    for (std::pair<int, int> sc : spriteCollisions) {
-        if ((sc.first == id && sc.second == spriteId) || (sc.first == spriteId && sc.second == id)) {
-            return true;
-        }
+bool Sprite::isCollidingWith(Sprite *sprite) {
+    if (std::find(spriteCollisions.begin(), spriteCollisions.end(), sprite) != spriteCollisions.end()) {
+        return true;
     }
     return false;
 }
 
 bool Sprite::isCollidingWithTag(std::string tag) {
-    for (std::pair<int, std::string> sc : tagCollisions) {
-        if (sc.first == id && sc.second.compare(tag) == 0) {
-            return true;
-        }
+    if (std::find(tagCollisions.begin(), tagCollisions.end(), tag) != tagCollisions.end()) {
+        return true;
     }
+
     return false;
 }
 
@@ -390,3 +379,11 @@ void Sprite::setAngle(float angle) {
 }
 
 float Sprite::getAngle() { return angle; }
+
+void Sprite::addTagCollision(std::string tag) {
+    if (std::find(tagCollisions.begin(), tagCollisions.end(), tag) == tagCollisions.end()) {
+        tagCollisions.push_back(tag);
+    }
+}
+
+

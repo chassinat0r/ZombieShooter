@@ -4,7 +4,9 @@
 #include <engine/sprite.h>
 #include <character.h>
 
-class Player : public Character {
+#include <events.h>
+
+class Player : public Character, public ZombieHitListener {
     public:
         Player(float x, float y, float scale = 1.0f, bool solid = false);
         Player();
@@ -23,6 +25,8 @@ class Player : public Character {
 
         void die();
 
+        void onZombieHit(Zombie *zombie);
+        
     private:
         bool moving = false;
         bool running = false;

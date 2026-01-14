@@ -107,9 +107,31 @@ void framebuffer_size_callback(GLFWwindow* window, int w, int h) {
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        printf("left button clicked\n");
-    }
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        Inv_Item *selectedItem = hotbar->getSelectedItem();
+
+        if (selectedItem->itemType == LD_RANGED) {
+            if (selectedItem->itemId == 1) {
+                if (selectedItem->isInTimeout) {
+                    printf("timeout\n");
+                } else if (selectedItem->isReloading) {
+                    printf("gun is reloading\n");
+                } else if (selectedItem->loadedAmmo == 0) {
+                    if (selectedItem->totalAmmo == 0) {
+                        printf("no more ammo\n");
+                    } else {
+                        printf("press R to reload ammo\n");
+                    }
+                } else {
+                    printf("shoot gun\n");
+                    float realAngle = (playerDir == 1) ? -projectileAngle : projectileAngle;
+                    // new Bullet(player->getX()+8.0f, player->getY()+1.0f, 1.0f, realAngle);
+                    selectedItem->loadedAmmo--;
+                    selectedItem->isInTimeout = true;
+                    selectedItem->timeout = 0;
+                }
+            }
+        }
+    } else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         printf("right button clicked\n");
     }
 }
@@ -165,16 +187,19 @@ void handleInput() {
     if (Keyboard::isKeyReleased(window, GLFW_KEY_2)) {
 
     }
+
+    if (Keyboard::isKeyPressed(window, GLFW_KEY_R)) {
+        hotbar->reload();
+    }
+    if (Keyboard::isKeyReleased(window, GLFW_KEY_R)) {
+
+    }
 }
 
 void update() {
     player->update();
     zombie->update();
-
-    if (player->isCollidingWith(*zombie) && !zombie->isInCooldown()) {
-        player->removeHealth();
-        zombie->registerAttack();
-    }
+    hotbar->update();
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -230,7 +255,9 @@ int main() {
     Inv_Item knife;
     knife.itemId = 0;
     knife.itemType = MELEE;
-    knife.timeout = 200;
+    knife.isInTimeout = false;
+    knife.timeout = 0;
+    knife.timeoutDuration = 200;
     knife.hasDurability = true;
     knife.currentDurability = 70;
     knife.maxDurability = 100;
@@ -238,36 +265,14 @@ int main() {
     Inv_Item pistol;
     pistol.itemId = 1;
     pistol.itemType = LD_RANGED;
-    pistol.timeout = 800;
+    pistol.isInTimeout = false;
+    pistol.timeout = 0;
+    pistol.timeoutDuration = 800;
     pistol.doesReload = true;
-    pistol.reloadTime = 5000;
+    pistol.reloadTimePerAmmo = 1000;
     pistol.loadedAmmo = 5;
     pistol.maxLoadedAmmo = 8;
     pistol.totalAmmo = 60;
-
-    Inv_Item grenade;
-    grenade.itemId = 2;
-    grenade.itemType = HD_RANGED;
-    grenade.timeout = 20000;
-    grenade.hasDurability = true;
-    grenade.currentDurability = 4;
-    grenade.maxDurability = 5;
-    
-    Inv_Item bleeding;
-    bleeding.itemId = 3;
-    bleeding.itemType = CURSE;
-    bleeding.timeout = 15000;
-    bleeding.hasDurability = true;
-    bleeding.currentDurability = 4;
-    bleeding.maxDurability = 10;
-
-    Inv_Item speed;
-    speed.itemId = 4;
-    speed.itemType = POWERUP;
-    speed.timeout = 30000;
-    speed.hasDurability = true;
-    speed.currentDurability = 2;
-    speed.maxDurability = 6;
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -313,13 +318,14 @@ int main() {
 
     TextureManager::loadTex("assets/knife.png", "knife", 1, 1);
     TextureManager::loadTex("assets/pistol.png", "pistol", 1, 1);
+    TextureManager::loadTex("assets/bullet.png", "bullet", 1, 1);
 
     FontManager::init();
-    FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 48);
+    FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 24);
     
     player = new Player(0, 55, 1.0f, true);
-    player->setMaxHealth(100);
-    player->setHealth(100);
+    player->setMaxHealth(50);
+    player->setHealth(50);
     zombie = new Zombie(80, 55, 100, 100, 1.0f, true);
     zombie->setTarget(player->getID());
     

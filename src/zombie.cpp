@@ -1,9 +1,10 @@
 #include <zombie.h>
 #include <global.h>
+#include <events.h>
 
 #include <GLFW/glfw3.h>
 
-Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "zombie", scale, solid) {
+Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Sprite(x, y, "zombie", scale, solid, true) {
     this->health = healthCurr;
     this->healthMax = healthMax;
 
@@ -57,6 +58,10 @@ void Zombie::update() {
     if (isCollidingWithTag("ground") && isGrounded()) {
         jump(100.0f);
     }
+
+    if (isCollidingWithTag("player") && !timeOut) {
+        new ZombieHitEvent(this);
+    }
     
     if (timeOut) {
         cdProgress += (glfwGetTime()*1000 - Global::last_frame_time);
@@ -78,7 +83,7 @@ void Zombie::update() {
     }
 
 
-    if (!isCollidingWith(*target)) {
+    if (!isCollidingWith(target)) {
         if (direction == 1) {
             move(-speed, 0);
         } else {

@@ -10,8 +10,10 @@ class Hotbar {
 
         Inv_Item * selectItem(int index);
         Inv_Item * getSelectedItem();
-        
+
+        void reload();
         void draw();
+        void update();
 
     private:
         Inv_Item *items[2] = { nullptr, nullptr };

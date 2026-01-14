@@ -5,7 +5,7 @@
 #include <global.h>
 #include <util.h>
 
-Player::Player(float x, float y, float scale, bool solid) : Character(x, y, "player", scale, solid) {
+Player::Player(float x, float y, float scale, bool solid) : Character(x, y, "player", scale, solid, true) {
     Animation playerIdleLeft("idle_left");
     playerIdleLeft.addFrame("player", 1, 0, 2, 1, 700);
     playerIdleLeft.addFrame("player", 1, 1, 2, 2, 700);
@@ -112,6 +112,8 @@ Player::Player(float x, float y, float scale, bool solid) : Character(x, y, "pla
 
     // Set idle_right as starting animation
     setAnimation("idle_right");
+
+    ZombieHitEvent::addListener(this);
 }
 
 Player::Player() {
@@ -242,4 +244,10 @@ void Player::die() {
     velocityX = 0;
     velocityY = 0;
     health = healthMax;
+}
+
+void Player::onZombieHit(Zombie *zombie) {
+    printf("ouch, a zombie hit me!\n");
+    removeHealth();
+    zombie->registerAttack();
 }

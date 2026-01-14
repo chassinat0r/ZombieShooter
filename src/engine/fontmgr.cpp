@@ -94,17 +94,24 @@ void FontManager::drawText(std::string text, std::string fontName, int x, int y,
 
     std::map<char, FontChar> fontChars = loadedFonts.at(fontName);
 
+    float strWidth = 0;
+    
     std::string::const_iterator c;
+
     for (c = text.begin(); c != text.end(); c++) {
-        if (*c == '\n') {
-            y -= (fontChars['A'].size.y) + 2;
-            x = originalX;
-            continue;
-        }
         FontChar fc = fontChars[*c];
 
-        float xPos = x + fc.bearing.x;
-        float yPos = y - (fc.size.y - fc.bearing.y);
+        strWidth += fc.advance >> 6;
+    }
+
+    float xf = x - 0.5f*strWidth;
+    float yf = y;
+
+    for (c = text.begin(); c != text.end(); c++) {
+        FontChar fc = fontChars[*c];
+
+        float xPos = xf + fc.bearing.x;
+        float yPos = yf - (fc.size.y - fc.bearing.y);
 
         float w = fc.size.x;
         float h = fc.size.y;
@@ -127,7 +134,7 @@ void FontManager::drawText(std::string text, std::string fontName, int x, int y,
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        x += (fc.advance >> 6);
+        xf += (fc.advance >> 6);
     }
 
     glBindVertexArray(0);

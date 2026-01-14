@@ -12,12 +12,16 @@ typedef enum {
 typedef struct {
     int itemId;
     Item_Type itemType;
+    bool isInTimeout;
     int timeout;
+    int timeoutDuration;
     bool hasDurability;
     int currentDurability;
     int maxDurability;
     bool doesReload;
-    int reloadTime;
+    bool isReloading;
+    int reloadTimePerAmmo;
+    int reloadTimer;
     int loadedAmmo;
     int maxLoadedAmmo;
     int totalAmmo;
