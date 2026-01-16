@@ -11,6 +11,8 @@ class Player : public Character, public ZombieHitListener {
         Player(float x, float y, float scale = 1.0f, bool solid = false);
         Player();
 
+        void draw(Camera *camera);
+        
         void update();
         void drawHealthBar();
 

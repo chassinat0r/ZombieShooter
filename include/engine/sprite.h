@@ -17,13 +17,16 @@ class Sprite : public CollidableObject {
         void setAnimation(std::string name);
         void resetHitboxes();
 
-        void draw(Camera *camera);
+        virtual void draw(Camera *camera);
+        static void drawAll(Camera *camera);
+
         void move(float dx, float dy);
         void jump(float jumpSpeed = 200.0f);
         void rotate(float diff);
         void setAngle(float angle);
 
         virtual void update();
+        static void updateAll();
         
         void addHitbox(std::string animationName, int frame, int x1, int y1, int x2, int y2);
         void addCollisionLayer(int layer);

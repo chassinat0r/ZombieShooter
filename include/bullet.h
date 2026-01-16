@@ -15,7 +15,8 @@ class Bullet : public Sprite {
         void update();
 
     private:
-        float speed = 30.0f;
+        float speed = 60.0f;
+        float moveAngle;
 };
 
 #endif

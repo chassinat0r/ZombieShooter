@@ -84,12 +84,20 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
     if (selectedItem->itemType == LD_RANGED) {
         std::pair<float,float> scrDimensions = getRenderWidthAndHeight();
         float scrMouseX = (mousePos.x - 0.5f*(float)Global::width) * (scrDimensions.first / (float)Global::width);
-        float scrMouseY = -1.0f*(mousePos.y - 0.5f*(float)Global::height) * (scrDimensions.second / (float)Global::height);
+        float scrMouseY = (mousePos.y - 0.5f*(float)Global::height) * (scrDimensions.second / (float)Global::height);
         
-        if ((player->getDirection() == 1 && scrMouseX <= 0)
-        || (player->getDirection() == 2 && scrMouseX >= 0)) {
-            projectileAngle = atan2(-scrMouseY, (player->getDirection() == 1) ? -scrMouseX : scrMouseX);
-            realAngle = atan2(-scrMouseY, scrMouseX);
+        int playerDirection = player->getDirection();
+        if ((playerDirection == 1 && scrMouseX <= 0)
+        || (playerDirection == 2 && scrMouseX >= 0)) {
+            projectileAngle = atan2(scrMouseX, (playerDirection == 1 ? scrMouseY : -scrMouseY)) + (playerDirection == 1 ? 0.5f*M_PI : -0.5f*M_PI);
+            
+            if (projectileAngle < -0.25f*M_PI) {
+                projectileAngle = -0.25f*M_PI;
+            } else if (projectileAngle > 0.25f*M_PI) {
+                projectileAngle = 0.25f*M_PI;
+            } else {
+                realAngle = atan2(scrMouseX, -scrMouseY);
+            }
         }
 
     }
@@ -193,13 +201,9 @@ void handleInput() {
 }
 
 void update() {
-    player->update();
-    zombie->update();
-    hotbar->update();
+    Sprite::updateAll();
 
-    for (Bullet *bullet : Bullet::bullets) {
-        bullet->update();
-    }
+    hotbar->update();
 
     camera.x = (int)player->getX();
     camera.y = (int)player->getY();
@@ -213,13 +217,7 @@ void draw() {
 
     Global::level->render(&camera);
 
-    std::vector<Sprite*> sorted = Sprite::sprites;
-
-    quickSort(&sorted, 0, sorted.size()-1);
-    
-    for (Sprite *s : sorted) {
-        s->draw(&camera);
-    }
+    Sprite::drawAll(&camera);
 
     player->drawHealthBar();
 
@@ -233,10 +231,6 @@ void draw() {
         reflection.x = 1;
     }
 
-    for (Bullet *bullet : Bullet::bullets) {
-        bullet->draw(&camera);
-    }
-
     if (selectedItem != nullptr) {
         switch (selectedItem->itemId) {
             case 0:
@@ -248,10 +242,10 @@ void draw() {
                 TextureManager::drawTex(std::floor(player->getX())+2.0f, std::floor(player->getY())+1.0f, 0.4f, projectileAngle, &camera, reflection);
                 break;
         }
-        
     }
 
-    // FontManager::drawText("Hello there!\nlol", "arial24", -Global::width*0.5f, 0.0f, glm::vec3(255.0f, 0.0f, 0.0f));
+    // TextureManager::setTex("knife", 0, 0, 1, 1);
+    // TextureManager::drawTex(0, 0, 3.0f, toRadians(90));
     glfwSwapBuffers(window);
 }
 
@@ -323,6 +317,8 @@ int main() {
     TextureManager::loadTex("assets/knife.png", "knife", 1, 1);
     TextureManager::loadTex("assets/pistol.png", "pistol", 1, 1);
     TextureManager::loadTex("assets/bullet.png", "bullet", 1, 1);
+
+    TextureManager::loadTex("assets/hero_arm.png", "hero_arm", 2, 2);
 
     FontManager::init();
     FontManager::loadFont("assets/fonts/arial.ttf", "arial24", 24);

@@ -4,6 +4,7 @@
 #include <constants.h>
 #include <global.h>
 #include <util.h>
+#include <bullet.h>
 
 #include <algorithm>
 #include <math.h>
@@ -387,3 +388,15 @@ void Sprite::addTagCollision(std::string tag) {
 }
 
 
+void Sprite::drawAll(Camera *camera) {
+    for (Sprite *sprite : sprites) {
+        sprite->draw(camera);
+    }
+}
+
+void Sprite::updateAll() {
+    
+    for (Sprite *sprite : sprites) {
+        sprite->update();
+    }
+}

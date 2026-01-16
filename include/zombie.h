@@ -28,6 +28,8 @@ class Zombie : public Character, public BulletHitListener {
         void onBulletHit();
 
     private:
+        void die();
+        
         bool timeOut = false;
         float cooldown = 500;
         float cdProgress = 0;

@@ -3,13 +3,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <util.h>
 
 Bullet::Bullet(float x, float y, float angle, float scale) : Sprite(x, y, "bullet", scale, true) {
     Animation bullet("bullet");
     bullet.addFrame("bullet", 0, 0, 1, 1, 100);
     addAnimation("bullet", bullet);
 
-    addHitbox("bullet", 0, 0, 0, 5, 1);
+    addHitbox("bullet", 0, 0, 0, 1, 4);
 
     setAnimation("bullet");
 
@@ -23,8 +24,8 @@ Bullet::Bullet() {
 }
 
 void Bullet::update() {
-    velocityX = speed * cos(angle);
-    velocityY = -speed * sin(angle);
+    velocityX = speed * sin(angle);
+    velocityY = speed * cos(angle);
     Sprite::update();
 
     bool hit = false;
@@ -39,6 +40,5 @@ void Bullet::update() {
     if (hit) {
         bullets.erase(std::remove(bullets.begin(), bullets.end(), this), bullets.end());
         sprites.erase(std::remove(sprites.begin(), sprites.end(), this), sprites.end());
-
     }
 }

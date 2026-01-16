@@ -175,6 +175,54 @@ void Player::update() {
     }
 }
 
+void Player::draw(Camera *camera) {
+    Sprite::draw(camera);
+
+    if (currentAnimation == "idle_left") {
+        if (currentFrame == 0) {
+            TextureManager::setTex("hero_arm", 1, 0, 2, 1, "centre", "top");
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        } else {
+            TextureManager::setTex("hero_arm", 1, 1, 2, 2, "centre", "top");
+            TextureManager::drawTex(std::floor(x), std::floor(y), scale, 0, camera);
+        }
+    } else if (currentAnimation == "idle_right") {
+        if (currentFrame == 0) {
+            TextureManager::setTex("hero_arm", 0, 0, 1, 1, "centre", "top");
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        } else {
+            TextureManager::setTex("hero_arm", 0, 1, 1, 2, "centre", "top");
+            TextureManager::drawTex(std::floor(x), std::floor(y), scale, 0, camera);
+        }
+    } else if (currentAnimation == "fall_left") {
+        TextureManager::setTex("hero_arm", 1, 1, 2, 2, "centre", "top");
+        TextureManager::drawTex(std::floor(x), std::floor(y), scale, 0, camera);
+    } else if (currentAnimation == "fall_right") {
+        TextureManager::setTex("hero_arm", 0, 1, 1, 2, "centre", "top");
+        TextureManager::drawTex(std::floor(x), std::floor(y), scale, 0, camera);
+    } else if (currentAnimation == "walk_left") {
+        TextureManager::setTex("hero_arm", 1, 0, 2, 1, "centre", "top");
+        if (currentFrame == 0) {
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        } else {
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        }
+    } else if (currentAnimation == "walk_right") {
+        TextureManager::setTex("hero_arm", 0, 0, 1, 1, "centre", "top");
+        if (currentFrame == 0) {
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        } else {
+            TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+        }
+    } else if (currentAnimation == "jump_left") {
+        TextureManager::setTex("hero_arm", 1, 1, 2, 2, "centre", "top");
+        TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+    } else if (currentAnimation == "jump_right") {
+        TextureManager::setTex("hero_arm", 0, 1, 1, 2, "centre", "top");
+        TextureManager::drawTex(std::floor(x), std::floor(y+scale), scale, 0, camera);
+    }
+}
+
 void Player::drawHealthBar() {
     std::pair<float,float> wh = getRenderWidthAndHeight();
     float w = wh.first;

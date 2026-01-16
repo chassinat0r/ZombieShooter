@@ -3,6 +3,8 @@
 
 #include <events/ZombieHitEvent.h>
 
+#include <algorithm>
+
 #include <GLFW/glfw3.h>
 
 Zombie::Zombie(float x, float y, int healthMax, int healthCurr, float scale, bool solid) : Character(x, y, "zombie", scale, solid, true) {
@@ -93,7 +95,7 @@ void Zombie::update() {
     }
 
     if (health == 0) {
-        printf("zombie died!\n");
+        die();
     }
 }
 
@@ -116,4 +118,8 @@ void Zombie::setTarget(int targetId) {
 
 void Zombie::onBulletHit() {
     removeHealth(2);
+}
+
+void Zombie::die() {
+    sprites.erase(std::remove(sprites.begin(), sprites.end(), this), sprites.end());
 }

@@ -172,7 +172,7 @@ void TextureManager::drawTex(float x, float y, float scale, float angle, Camera 
     }
     view = glm::scale(view, glm::vec3((float)scale, (float)scale, 1.0f));
     view = glm::scale(view, glm::vec3((float)texWidth, (float)texHeight, 1.0f));
-    view = glm::rotate(view, 2.0f*(float)M_PI - angle, glm::vec3(0, 0, 1));
+    view = glm::rotate(view, -angle, glm::vec3(0, 0, 1));
 
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(x, y, 0.0f));
